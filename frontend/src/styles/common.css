@@ -1,0 +1,74 @@
+/* ===== Global ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body, html { font-family: 'Segoe UI', sans-serif; color:#252422; }
+html, body { height: 100%; }
+/* ===== Navbar / Header ===== */
+.navbar {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:1.5rem 2rem; background:#403D39; color:#FFFCF2;
+}
+.logo-section { display:flex; align-items:center; gap:.5rem; }
+.logo-icon { width:50px; height:50px; }
+.logo-text { font-size:1.5rem; font-weight:bold; color:#FFFCF2;display: flex;align-items: center; }
+.nav-links { list-style:none; display:flex; gap:2rem; }
+.nav-links a { color:#FFFCF2; text-decoration:none; font-weight:500; }
+.auth-buttons button{
+  margin-left:1rem; padding:.5rem 1rem; border:none; border-radius:20px;
+  cursor:pointer; font-weight:500;
+}
+.login-btn { background:transparent; color:#EB5E28; border:1px solid #EB5E28; }
+.register-btn { background:#EB5E28; color:#FFFCF2; }
+
+/* ===== Hero (shared) ===== */
+.hero{
+  text-align:center; padding:3rem 2rem;
+  background:url('../assets/bg.png') no-repeat center/cover; 
+  position:relative;
+  height:400px;                 /* keeps the larger image you asked for */
+  display:flex;                 /* enables centering */
+  flex-direction:column;        /* stack h1, p, .features */
+  justify-content:center;       /* vertical centering */
+  align-items:center;  
+}
+.hero::before{
+  content:""; inset:0; position:absolute; background:rgba(58,58,58,.7); z-index:0;
+}
+.hero>*{ position:relative; z-index:1; align-items: center;}
+.hero h1{ font-size:2.8rem; font-weight:bold; margin-bottom:1rem; color:#FFFCF2; }
+.hero p{ font-size:1.2rem; color:#CCC5B9; margin-bottom:2rem; }
+
+/* ===== Feature buttons ===== */
+.features{ display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; margin-bottom:3rem; }
+.features button{
+  background:#EB5E28; color:#FFFCF2; border:none; border-radius:5px;
+  padding:.7rem 1.5rem; display:flex; align-items:center; gap:.5rem; cursor:pointer; font-weight:bold;
+}
+
+/* ===== Chatbot fab ===== */
+.chatbot-fab{
+  position:fixed; bottom:2rem; right:2rem; background:#EB5E28; color:#fff;
+  border-radius:50%; width:60px; height:60px; display:flex; justify-content:center; align-items:center;
+  cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
+
+/* ===== Footer ===== */
+.footer{ background:#252422; color:#fffcf2; padding:3rem 2rem 1rem; }
+.footer-section{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:2rem; padding-bottom:2rem; }
+.footer-brand{ max-width:600px; }
+.footer-logo{ width:250px; height:250px; object-fit:contain; margin-top:4px; }
+.footer-brand h3{ font-size:1.5rem; margin:.5rem 0; }
+.footer-links{ display:flex; gap:4rem;align-items: center; }
+.footer-links h4{ font-size:1.2rem; margin-bottom:1rem; }
+.footer-links ul{ list-style:none; padding:0; }
+.footer-links li{ margin-bottom:.5rem; }
+.footer-links a{ text-decoration:none; color:#ccc; }
+.footer-links a:hover{ color:#fff; }
+.footer-bottom{
+  display:flex; justify-content:space-between; flex-wrap:wrap;
+  border-top:1px solid #444; padding-top:1rem; font-size:.9rem; margin-top:1rem;
+}
+.footer-bottom a, .footer-bottom p{ color:#ccc; text-decoration:none; }
+.footer-bottom a:hover{ color:#fff; }
+.logo-text-wrapper{ display:flex; align-items:center; gap:1.5rem; max-width:750px; }
+.brand-text h3{ font-size:1.5rem; margin:0 0 10px; }
+.brand-text p{ text-align:justify; line-height:1.5; font-size:.9rem; color:#ccc; }
