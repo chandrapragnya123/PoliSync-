@@ -36,9 +36,6 @@ const HomeOfficer = () => {
         </div>
       </section>
 
-      {/* Chatbot FAB */}
-      <div className="chatbot-fab"><FaRobot size={24} /></div>
-
       <Footer />
       <ToastContainer />
     </div>
