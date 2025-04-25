@@ -29,11 +29,12 @@ const HomeOfficer = () => {
         <p>Safeguarding Together: Your Bridge to a Secure Environment</p>
 
         <div className="features">
-          <Link to="/view-dashboard"><button>View Dashboard</button></Link>
-          <Link to="/view-fir"><button>View FIR</button></Link>
-          <Link to="/manage-complaints"><button>Manage Complaints</button></Link>
-          <Link to="/respond-to-reports"><button>Respond to Reports</button></Link>
+          <Link to="/view-dashboard" className="feature-button">View Dashboard</Link>
+          <Link to="/view-fir" className="feature-button">View FIR</Link>
+          <Link to="/manage-complaints" className="feature-button">Manage Complaints</Link>
+          <Link to="/respond-to-reports" className="feature-button">Respond to Reports</Link>
         </div>
+
       </section>
 
       <Footer />
