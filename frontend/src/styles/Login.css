@@ -1,209 +1,221 @@
 /* Base styles */
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  /* Main container */
-  .login-page {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-    position: relative;
-  }
-  
-  /* Left side - image section */
-  .image-side {
-    flex: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    position: relative;
-  }
-  
-  .image-side::before {
-    content: '';
-    background: url('../assets/bg.png') no-repeat center center/cover;
-  
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    position: absolute;
-  }
-  
-  /* Right side - form section */
-  .form-side {
-    flex: 1;
-    background-color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 3rem;
-    position: relative;
-    z-index: 2;
-  }
-  
-  /* Logo (optional - top right) */
-  .logo {
-    position: absolute;
-    top: 1.5rem;
-    right: 2rem;
-    height: 50px;
-  }
-  
-  /* Form styling */
-  form {
-    width: 100%;
-    max-width: 500px;
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  
-  form h1 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-    color: #333;
-  }
-  
-  form label {
-    font-weight: 500;
-    margin-top: 1rem;
-    display: block;
-  }
-  
-  form input {
-    width: 100%;
-    padding: 0.75rem;
-    margin-top: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    outline: none;
-    box-sizing: border-box;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-  }
-  
-  form input:focus {
-    border-color: #252422;
-    box-shadow: 0 0 0 2px rgba(92, 106, 196, 0.2);
-  }
-  
-  form button {
-    margin-top: 1.5rem;
-    background-color: #EB5E28;
-    color: white;
-    border: none;
-    padding: 0.75rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s ease;
-  }
-  
-  form button:hover {
-    background-color: #EB5E28;
-  }
-  
-  span {
-    text-align: center;
-    margin-top: 1rem;
-    display: block;
-    font-size: 0.95rem;
-  }
-
-  .signup-options {
-    color: #1e90ff;
-    font-weight: 500;
-  }
-  
-  .rules a {
-    color: #0d6efd;
-    text-decoration: none;
-    margin-left: 5px;
-    font-weight: 500;
-  }
-  
-  a:hover {
-    text-decoration: underline;
-  }
-  
-  /*Toggle buttons*/
-  .login-toggle {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    justify-content: center;
-  }
-  
-  .toggle-button {
-    padding: 0.5rem 1rem;
-    background-color: #1e90ff;
-    border: none;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: 500;
-    transition: background-color 0.3s;
-  }
-  
-  .toggle-button:hover {
-    background-color: #0d6efd;
-  }
-  
-  /* ========= Role Switch Buttons ========= */
-.role-switch{
-  display:flex;
-  gap:1rem;
-  justify-content:center;
-  margin-bottom:1.5rem;
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.role-switch button{
-  position:relative;
-  padding:0.55rem 2.5rem;
-  font-weight:600;
-  font-size:0.95rem;
-  border-radius:30px;
-  border:2px solid #EB5E28;     /* brand orange border */
-  background:transparent;
-  color:#EB5E28;
-  cursor:pointer;
+/* Main container */
+.login-page {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Left side - image section */
+.image-side {
+  flex: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  position: relative;
+}
+
+.image-side::before {
+  content: '';
+  background: url('../assets/loginBG.png') no-repeat;
+  background-size: 100% 100%;
+  /* Stretches width 100%, locks height to container */
+  background-position: center;
+  /* Centers the image */
+  width: 100%;
+  height: 615px;
+  /* 👈 Set a fixed height (adjust as needed) */
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Right side - form section */
+.form-side {
+  flex: 1;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Logo (optional - top right) */
+.logo {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  height: 50px;
+}
+
+/* Form styling */
+form {
+  width: 100%;
+  max-width: 500px;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+form h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+form label {
+  font-weight: 500;
+  margin-top: 1rem;
+  display: block;
+}
+
+form input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+form input:focus {
+  border-color: #252422;
+  box-shadow: 0 0 0 2px rgba(92, 106, 196, 0.2);
+}
+
+form button {
+  margin-top: 1.5rem;
+  background-color: #EB5E28;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #EB5E28;
+}
+
+span {
+  text-align: center;
+  margin-top: 1rem;
+  display: block;
+  font-size: 0.95rem;
+}
+
+.signup-options {
+  color: #1e90ff;
+  font-weight: 500;
+}
+
+.rules a {
+  color: #0d6efd;
+  text-decoration: none;
+  margin-left: 5px;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/*Toggle buttons*/
+.login-toggle {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.toggle-button {
+  padding: 0.5rem 1rem;
+  background-color: #1e90ff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.toggle-button:hover {
+  background-color: #0d6efd;
+}
+
+/* ========= Role Switch Buttons ========= */
+.role-switch {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.role-switch button {
+  position: relative;
+  padding: 0.55rem 2.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 30px;
+  border: 2px solid #EB5E28;
+  /* brand orange border */
+  background: transparent;
+  color: #EB5E28;
+  cursor: pointer;
   transition: all .25s ease;
-  overflow:hidden;
+  overflow: hidden;
 }
 
 /* glowing underline when inactive hover */
-.role-switch button::after{
-  content:"";
-  position:absolute;
-  bottom:0; left:0;
-  width:100%;
-  height:0;
-  background:#EB5E28;
-  opacity:0.15;
-  transition:height .25s ease;
+.role-switch button::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background: #EB5E28;
+  opacity: 0.15;
+  transition: height .25s ease;
 }
-.role-switch button:hover::after{ height:100%; }
+
+.role-switch button:hover::after {
+  height: 100%;
+}
 
 /* Active (selected) state */
-.role-switch button.active{
-  background:#EB5E28;
-  color:#FFFCF2;
-  box-shadow:0 4px 12px rgba(235, 94, 40, .4);
+.role-switch button.active {
+  background: #EB5E28;
+  color: #FFFCF2;
+  box-shadow: 0 4px 12px rgba(235, 94, 40, .4);
 }
 
 /* Focus outline for accessibility */
-.role-switch button:focus-visible{
-  outline:3px dashed #FFFCF2;
-  outline-offset:3px;
+.role-switch button:focus-visible {
+  outline: 3px dashed #FFFCF2;
+  outline-offset: 3px;
 }
