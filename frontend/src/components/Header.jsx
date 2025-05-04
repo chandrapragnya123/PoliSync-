@@ -40,9 +40,9 @@ const Header = () => {
   else if (role === ROLES.OFFICER)
     extraLinks = (
       <>
-        <li><Link to="/view-dashboard">Dashboard</Link></li>
-        <li><Link to="/view-fir">Complaints</Link></li>
-        <li><Link to="/respond-to-reports">Respond</Link></li>
+        <li><Link to="/view-crime-dashboard">Dashboard</Link></li>
+        <li><Link to="/view-fir">FIR's</Link></li>
+        <li><Link to="/manage-complaints">Complaints</Link></li>
       </>
     );
 

@@ -19,9 +19,9 @@ const Footer = () => {
   else if (role === ROLES.OFFICER)
     pageLinks = (
       <>
-        <li><a href="/view-dashboard">Dashboard</a></li>
+        <li><a href="/view-crime-dashboard">Dashboard</a></li>
         <li><a href="/view-fir">View FIR</a></li>
-        <li><a href="/respond-to-reports">Respond</a></li>
+        <li><a href="/manage-complaints">Respond</a></li>
       </>
     );
   else
@@ -40,7 +40,7 @@ const Footer = () => {
             <img src={logo} alt="Crime Portal Logo" className="footer-logo" />
             <div className="brand-text">
               <h3>Crime Portal</h3>
-              <p>Our Crime Monitoring Portal provides real-time crime data and empowers citizens 
+              <p>Our Crime Monitoring Portal provides real-time crime data and empowers citizens
                 to report incidents. Together, we enhance public safety and foster community collaboration.</p>
             </div>
           </div>
