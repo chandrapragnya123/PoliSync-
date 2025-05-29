@@ -7,6 +7,8 @@ import Login from './pages/Login';
 import FileFIR from './pages/FileFIR';
 import Signup from './pages/Signup';
 import ViewFIR from './pages/ViewFIR';
+import RequireAuth from './components/RequireAuth'; // or the correct path
+import FIRConfirmation from './pages/FIRconfirmationPage'; // Ensure this matches the exact casing of the file: FIRconfirmationPage.jsx
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -26,6 +28,8 @@ const App = () => (
       <Route path="/view-fir" element={<ViewFIR />} />
       <Route path="/view-crime-dashboard" element={<ViewCrimeDashboard/>} />
       <Route path="/manage-complaints" element={<ManageComplaints/>} />
+      <Route path="/fir-confirmation" element={<RequireAuth role="citizen"><FIRConfirmation /></RequireAuth>} 
+/>
 
       {/* ...other routes */}
     </Routes>
