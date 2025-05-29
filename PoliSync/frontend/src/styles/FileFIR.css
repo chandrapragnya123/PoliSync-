@@ -1,0 +1,280 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #ff9f43, #ff6b6b);
+  background-repeat: no-repeat;
+  background-attachment: fixed;   /* keeps it locked while scrolling   */
+  background-size: 100% 100%;
+  min-height: 100vh;
+  text-align: left;
+}
+
+.form-container {
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.form-wrapper {
+  width: 60%;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px 40px;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  transform: translateY(0);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.filefir-form h1.main-heading {
+  text-align: center;
+  background: linear-gradient(135deg, #1a237e, #3949ab);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 25px;
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.section-heading {
+  color: #1a237e;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  position: relative;
+  padding-left: 15px;
+  text-align: left;
+}
+
+.section-heading::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to bottom, #1a237e, #3949ab);
+  border-radius: 2px;
+}
+
+.filefir-form label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: #334155;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-align: left;
+}
+
+.filefir-form input,
+.filefir-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.filefir-form input:focus,
+.filefir-form textarea:focus {
+  outline: none;
+  border-color: #3949ab;
+  box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.1);
+  background-color: #fff;
+}
+
+.filefir-form textarea {
+  height: 120px;
+  resize: vertical;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  margin-top: 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  display: block;
+  width: 100%;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.crime-type-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.crime-type-checkboxes label {
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  padding: 14px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0;
+}
+
+.crime-type-checkboxes label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.crime-type-checkboxes input[type="checkbox"] {
+  transform: scale(1.3);
+  accent-color: #fff;
+  margin: 0;
+  width: auto;
+}
+
+.toggle-info-btn {
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  font-size: 1.05rem;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.toggle-info-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.3);
+  background: linear-gradient(135deg, #357abd, #2563eb);
+}
+
+.crime-info-box {
+  background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
+  border-left: none;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 16px;
+  font-size: 1.05rem;
+  color: #1e293b;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  animation: slideDown 0.3s ease-out;
+}
+
+.crime-info-box p {
+  margin: 16px 0;
+  padding-left: 20px;
+  position: relative;
+  text-align: left;
+}
+
+.crime-info-box p:first-child {
+  margin-top: 0;
+}
+
+.crime-info-box p:last-child {
+  margin-bottom: 0;
+}
+
+.crime-info-box p::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #dc2626;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.crime-info-box strong {
+  color: #1a237e;
+  font-size: 1.1rem;
+  display: inline-block;
+  margin-right: 8px;
+  border-bottom: 2px solid #dc2626;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .form-wrapper {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .crime-type-checkboxes {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .filefir-form h1.main-heading {
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .submit-btn,
+  .toggle-info-btn {
+    font-size: 1rem;
+    padding: 12px 20px;
+  }
+
+  .crime-info-box {
+    font-size: 1rem;
+    padding: 20px;
+  }
+}
+
+/* Optional - To improve checkbox spacing and alignment on all views */
+.crime-type-checkboxes input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-right: 8px;
+}
+
+.crime-type-checkboxes label {
+  padding: 12px 16px;
+  font-size: 1rem;
+  gap: 10px;
+}
