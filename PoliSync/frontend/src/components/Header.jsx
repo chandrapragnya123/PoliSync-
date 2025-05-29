@@ -1,8 +1,8 @@
 // components/Header.jsx
-import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getRole, clearRole, ROLES } from '../utils/auth';
 import logo from '../assets/logo.png';
-import { clearRole, getRole, ROLES } from '../utils/auth';
+import { useEffect, useState } from 'react';
 
 const Header = () => {
   const [role, setRole] = useState(getRole());
@@ -24,8 +24,8 @@ const Header = () => {
   /* ---------- menus per role ---------- */
   const commonLinks = (
     <>
-      <li><button onClick={() => navigate('/')} className="nav-btn">Home</button></li>
-      <li><button onClick={() => navigate('/about')} className="nav-btn">About Us</button></li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/">About Us</a></li>
     </>
   );
 
@@ -40,9 +40,9 @@ const Header = () => {
   else if (role === ROLES.OFFICER)
     extraLinks = (
       <>
-        <li><Link to="/view-crime-dashboard">Dashboard</Link></li>
-        <li><Link to="/view-fir">FIR's</Link></li>
-        <li><Link to="/manage-complaints">Complaints</Link></li>
+        <li><Link to="/view-dashboard">Dashboard</Link></li>
+        <li><Link to="/view-fir">Complaints</Link></li>
+        <li><Link to="/respond-to-reports">Respond</Link></li>
       </>
     );
 
@@ -62,7 +62,7 @@ const Header = () => {
 
   return (
     <header className="navbar">
-      <div className="logo-section" onClick={() => navigate('/')}>
+      <div className="logo-section">
         <img src={logo} alt="Crime Portal Logo" className="logo-icon" />
         <span className="logo-text">Crime Portal</span>
       </div>
