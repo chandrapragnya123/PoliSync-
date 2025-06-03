@@ -9,42 +9,46 @@ const path = require('path');
 
 // Initialize Express app
 const app = express();
-app.use(express.json());
-app.use(cors());
+const PORT = process.env.PORT || 5000;
 
-// Import route modules
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Serve uploads folder statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/polisync', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.error('❌ MongoDB connection failed:', err));
+
+// Route imports
 const authRoutes = require('./routes/authRoutes');
 const firRoutes = require('./routes/firRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
+const filedCasesRoute = require('./routes/filedcases');
 
-// MongoDB Atlas Connection
-mongoose.connect(process.env.MONGO_URI, {
-  
-})
-.then(() => console.log('✅ Connected to MongoDB Atlas'))
-.catch(err => {
-  console.error('❌ MongoDB connection error:', err);
-  process.exit(1); // stop the app if DB fails
-});
-
-// API Routes
+// Route registration
 app.use('/api/auth', authRoutes);
 app.use('/api/firs', firRoutes);
 app.use('/api/complaints', complaintRoutes);
+app.use('/api/complaints', filedCasesRoute); // If needed, adjust to avoid duplicate paths
 
-// Serve static frontend (React build)
-app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-// Health check
+// Simple test route
 app.get('/api/test', (req, res) => {
   res.send('Server is running!');
 });
 
 // For React Router (catch-all route)
+// Serve React frontend in production
+app.use(express.static(path.join(__dirname, '../frontend/build')));
 app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
