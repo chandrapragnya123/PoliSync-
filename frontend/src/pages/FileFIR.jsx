@@ -1,65 +1,85 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FileText, Send } from 'lucide-react';
-import { useState } from 'react';
-import "../styles/FileFIR.css";
+import '../styles/FileFIR.css';
 
 const FileFIR = () => {
+  const navigate = useNavigate();
   const [showCrimeInfo, setShowCrimeInfo] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     address: '',
-    crimeTypes: [],
+    crimeType: [],
     incidentDate: '',
     incidentLocation: '',
     description: '',
-    evidence: null
+    evidence: null,
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleCheckboxChange = (e) => {
-    const { value, checked } = e.target;
-    setFormData(prev => {
-      const newCrimeTypes = checked
-        ? [...prev.crimeTypes, value]
-        : prev.crimeTypes.filter(type => type !== value);
-      return { ...prev, crimeTypes: newCrimeTypes };
-    });
-  };
+  const handleChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
 
-  const handleFileChange = (e) => {
-    setFormData(prev => ({ ...prev, evidence: e.target.files[0] }));
+    if (type === 'checkbox') {
+      setFormData((prev) => ({
+        ...prev,
+        crimeType: checked
+          ? [...prev.crimeType, value]
+          : prev.crimeType.filter((item) => item !== value),
+      }));
+    } else if (type === 'file') {
+      setFormData((prev) => ({
+        ...prev,
+        evidence: files[0],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  const data = new FormData();
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
-  for (const key in formData) {
-    if (key === 'crimeTypes') {
-      formData.crimeTypes.forEach(type => data.append('crimeTypes', type));
-    } else {
-      data.append(key, formData[key]);
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('email', formData.email);
+    data.append('phone', formData.phone);
+    data.append('address', formData.address);
+    data.append('incidentDate', formData.incidentDate);
+    data.append('incidentLocation', formData.incidentLocation);
+    data.append('description', formData.description);
+    formData.crimeType.forEach((type) => data.append('crimeTypes', type));
+    if (formData.evidence) data.append('evidence', formData.evidence);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/complaints/file', {
+        method: 'POST',
+        body: data,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        navigate('/fir-confirmation', { state: { firNumber: result.firNumber || 'N/A' } });
+      } else {
+        throw new Error(result.message || 'Submission failed.');
+      }
+    } catch (err) {
+      console.error('Error submitting FIR:', err);
+      setError(err.message || 'Failed to submit FIR. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-  }
-
-  try {
-    const response = await fetch('http://localhost:5000/api/complaints/file', {
-      method: 'POST',
-      body: data,
-    });
-
-    const result = await response.json();
-    alert(result.message || "FIR submitted.");
-  } catch (err) {
-    console.error("Error submitting FIR:", err);
-    alert("Submission failed.");
-  }
-};
+  };
 
   return (
     <div className="form-container">
@@ -70,18 +90,20 @@ const FileFIR = () => {
             File an FIR
           </h1>
 
+          {error && <div className="error-message">{error}</div>}
+
           <h2 className="section-heading">Personal Information</h2>
           <label htmlFor="name">Full Name:</label>
-          <input type="text" id="name" name="name" placeholder="Enter your full name" value={formData.name} onChange={handleInputChange} required />
+          <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="Enter your full name" />
 
           <label htmlFor="email">Email Address:</label>
-          <input type="email" id="email" name="email" placeholder="Enter your email address" value={formData.email} onChange={handleInputChange} required />
+          <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter your email address" />
 
           <label htmlFor="phone">Phone Number:</label>
-          <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" value={formData.phone} onChange={handleInputChange} required />
+          <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} required placeholder="Enter your phone number" />
 
           <label htmlFor="address">Address:</label>
-          <textarea id="address" name="address" placeholder="Enter your current address" value={formData.address} onChange={handleInputChange} required></textarea>
+          <textarea id="address" name="address" value={formData.address} onChange={handleChange} required placeholder="Enter your current address"></textarea>
 
           <h2 className="section-heading">Type of Crime</h2>
           <button
@@ -102,45 +124,42 @@ const FileFIR = () => {
           )}
 
           <div className="crime-type-checkboxes">
-            <label>
-              <input type="checkbox" name="crimeType" value="theft" onChange={handleCheckboxChange} />
-              Theft
-            </label>
-            <label>
-              <input type="checkbox" name="crimeType" value="assault" onChange={handleCheckboxChange} />
-              Assault
-            </label>
-            <label>
-              <input type="checkbox" name="crimeType" value="fraud" onChange={handleCheckboxChange} />
-              Fraud
-            </label>
-            <label>
-              <input type="checkbox" name="crimeType" value="cybercrime" onChange={handleCheckboxChange} />
-              Cybercrime
-            </label>
+            {['theft', 'assault', 'fraud', 'cybercrime'].map((crime) => (
+              <label key={crime}>
+                <input
+                  type="checkbox"
+                  name="crimeType"
+                  value={crime}
+                  checked={formData.crimeType.includes(crime)}
+                  onChange={handleChange}
+                />
+                {crime.charAt(0).toUpperCase() + crime.slice(1)}
+              </label>
+            ))}
           </div>
 
           <h2 className="section-heading">Incident Details</h2>
           <label htmlFor="incidentDate">Date of Incident:</label>
-          <input type="date" id="incidentDate" name="incidentDate" value={formData.incidentDate} onChange={handleInputChange} required />
+          <input type="date" id="incidentDate" name="incidentDate" value={formData.incidentDate} onChange={handleChange} required />
 
           <label htmlFor="incidentLocation">Location of Incident:</label>
-          <input type="text" id="incidentLocation" name="incidentLocation" placeholder="Enter the location of the incident" value={formData.incidentLocation} onChange={handleInputChange} required />
+          <input type="text" id="incidentLocation" name="incidentLocation" value={formData.incidentLocation} onChange={handleChange} required placeholder="Enter the location of the incident" />
 
           <label htmlFor="description">Description of Incident:</label>
-          <textarea id="description" name="description" placeholder="Describe the incident in detail" value={formData.description} onChange={handleInputChange} required></textarea>
+          <textarea id="description" name="description" value={formData.description} onChange={handleChange} required placeholder="Describe the incident in detail"></textarea>
 
           <h2 className="section-heading">Upload Evidence</h2>
-          <label>Upload Evidence File:</label>
-          <input type="file" name="evidence" onChange={handleFileChange} accept=".png,.jpg,.jpeg,.pdf,.doc,.docx" />
+          <label htmlFor="evidence">Upload Evidence File:</label>
+          <input type="file" name="evidence" accept=".png,.jpg,.jpeg,.pdf,.doc,.docx" onChange={handleChange} />
 
-          <button type="submit" className="submit-btn">
+          <button type="submit" className="submit-btn" disabled={isSubmitting}>
             <Send size={18} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-            Submit FIR
+            {isSubmitting ? 'Submitting...' : 'Submit FIR'}
           </button>
         </form>
       </div>
     </div>
   );
 };
+
 export default FileFIR;

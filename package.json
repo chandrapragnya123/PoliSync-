@@ -1,5 +1,9 @@
 {
   "dependencies": {
+
     "multer": "^2.0.0"
+=======
+    "bcrypt": "^6.0.0"
+
   }
 }
