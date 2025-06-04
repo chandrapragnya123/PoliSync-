@@ -1,9 +1,12 @@
 // pages/ViewFIR.jsx
+import React from 'react';
+import FIRTable from '../components/FIRTable'; // adjust path if needed
+
 const ViewFIR = () => {
     return (
         <div>
             <h2>All Registered FIRs</h2>
-            {/* You can later add a list or table here */}
+            <FIRTable />
         </div>
     );
 };

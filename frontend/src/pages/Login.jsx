@@ -8,23 +8,45 @@ import '../styles/Login.css';
 const roles = { citizen: 'Citizen', officer: 'Officer' };
 
 const Login = () => {
-  const [role, setRole] = useState('citizen');          // toggle state
+  const [role, setRole] = useState('citizen'); // toggle state
   const [form, setForm] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
   const onChange = e =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const submit = e => {
+  const submit = async (e) => {
     e.preventDefault();
     const { email, password } = form;
     if (!email || !password) return handleError('Email and password are required');
 
-    /* — front‑end only — */
-    handleSuccess(`${roles[role]} logged in successfully!`);
-    localStorage.setItem('loggedInUser', roles[role]);
-    localStorage.setItem('role', role);
-    setTimeout(() => navigate(role === 'citizen' ? '/homeCitizen' : '/homeOfficer'), 800);
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Login failed');
+      }
+
+      const data = await res.json();
+      const token = data.token;
+
+      // Store token and role in localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+      localStorage.setItem('loggedInUser', roles[role]);
+
+      handleSuccess(`${roles[role]} logged in successfully!`);
+
+      setTimeout(() => navigate(role === 'citizen' ? '/homeCitizen' : '/homeOfficer'), 800);
+
+    } catch (err) {
+      handleError(err.message);
+    }
   };
 
   return (
@@ -76,8 +98,6 @@ const Login = () => {
             Don&apos;t have an account? <Link to="/signup">Signup</Link>
           </span>
         </form>
-
-      
       </div>
 
       <ToastContainer />

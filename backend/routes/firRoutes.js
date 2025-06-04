@@ -1,4 +1,3 @@
-// Imports the Express framework to help define and manage HTTP routes.
 const express = require('express');
 const router = express.Router();
 
@@ -93,6 +92,25 @@ router.get('/approved', auth([USER_ROLES.POLICE]), async (req, res) => {
   try {
     const approvedFirs = await FIR.find({ status: 'Under Investigation' });
     res.json(approvedFirs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// Police/Admin views all FIRs (GET /api/firs)
+// Optional: you can add auth here if you want only certain roles to access this
+router.get('/', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN]), async (req, res) => {
+  try {
+    const firs = await FIR.find({}, {
+      'complainant.fullName': 1,
+      'incidentDetails.description': 1,
+      'incidentDetails.date': 1,
+      'crimeType.mainCategory': 1,
+      'status': 1,
+    }).lean();
+
+    res.json(firs);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

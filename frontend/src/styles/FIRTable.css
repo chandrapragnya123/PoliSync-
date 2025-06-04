@@ -1,0 +1,60 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #FFFDF2;
+    /* light background */
+    color: #252422;
+    /* dark text */
+    box-shadow: 0 4px 12px 0 #CCC5B9;
+    /* orange shadow */
+    font-family: Arial, sans-serif;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #CCC5B9;
+}
+
+th {
+    background-color: #CCC5B9;
+    /* header bg */
+    color: #252422;
+}
+
+tr:nth-child(even) {
+    background-color: #F0EEE4;
+    /* lighter shade for even rows */
+}
+
+tr:nth-child(odd) {
+    background-color: #FFFDF2;
+    /* white for odd rows */
+}
+
+tr:hover {
+    background-color: #EB5E28;
+    /* highlight row on hover/click */
+    color: #FFFDF2;
+    cursor: pointer;
+}
+
+/* Optional: If you want the clicked row to stay highlighted */
+tr.clicked {
+    background-color: #403D39 !important;
+    color: #FFFDF2 !important;
+}
+
+.fir-table-container {
+    padding: 40px 60px;
+    max-width: 95%;
+    margin: 0 auto;
+}
+
+.fir-table-container h2 {
+    margin-bottom: 24px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #252422;
+}
