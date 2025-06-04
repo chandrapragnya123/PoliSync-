@@ -5,7 +5,6 @@ import { handleError, handleSuccess } from '../utils';
 import logo from '../assets/logo.png';
 import '../styles/Login.css';
 
-
 const roles = { citizen: 'Citizen', officer: 'Officer' };
 
 const Signup = () => {
@@ -16,16 +15,39 @@ const Signup = () => {
   const onChange = e =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const submit = e => {
+  const submit = async e => {
     e.preventDefault();
     const { name, email, password } = form;
     if (!name || !email || !password) return handleError('All fields are required');
 
-    handleSuccess(`${roles[role]} account created!`);
-    /* mimic login right away */
-    localStorage.setItem('loggedInUser', name);
-    localStorage.setItem('role', role);
-    setTimeout(() => navigate(role === 'citizen' ? '/homeCitizen' : '/homeOfficer'), 800);
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Signup failed');
+      }
+
+      const data = await res.json();
+
+      const token = data.token;
+
+      // Store token and role in localStorage just like login
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+      localStorage.setItem('loggedInUser', name);
+
+      handleSuccess(`${roles[role]} account created and logged in!`);
+
+      setTimeout(() => navigate(role === 'citizen' ? '/homeCitizen' : '/homeOfficer'), 800);
+
+    } catch (err) {
+      handleError(err.message);
+    }
   };
 
   return (
