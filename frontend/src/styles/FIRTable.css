@@ -5,8 +5,8 @@ table {
     /* light background */
     color: #252422;
     /* dark text */
-    box-shadow: 0 4px 12px 0 #CCC5B9;
-    /* orange shadow */
+    box-shadow: 0 10px 12px 0 #CCC5B9;
+    /* white shadow */
     font-family: Arial, sans-serif;
 }
 
@@ -57,4 +57,9 @@ tr.clicked {
     font-size: 28px;
     font-weight: bold;
     color: #252422;
+}
+
+h2 {
+    margin-top: 30px;
+    text-align: center;
 }

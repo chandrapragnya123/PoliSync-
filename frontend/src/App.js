@@ -1,4 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext'; // ✅ Add this
+
 import HomeCitizen from './pages/HomeCitizen';
 import HomeOfficer from './pages/HomeOfficer';
 import LandingPage from './pages/LandingPage';
@@ -16,28 +18,30 @@ import ViewFIR from './pages/ViewFIR';
 import AboutUs from './pages/about_us';
 
 const App = () => (
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/homeCitizen" element={<HomeCitizen />} />
-      <Route path="/homeOfficer" element={<HomeOfficer />} />
-      <Route path="/file-fir" element={<FileFIR />} />
-      <Route path="/view-fir" element={<ViewFIR />} />
-      <Route path="/view-crime-dashboard" element={<ViewCrimeDashboard />} />
-      <Route path="/manage-complaints" element={<ManageComplaints />} />
-      <Route path="/about" element={<AboutUs />} />
-      <Route
-        path="/fir-confirmation"
-        element={
-          <RequireAuth role="citizen">
-            <FIRConfirmation />
-          </RequireAuth>
-        }
-      />
-    </Routes>
-  </BrowserRouter>
+  <AuthProvider> {/* ✅ Wrap your entire app with AuthProvider */}
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/homeCitizen" element={<HomeCitizen />} />
+        <Route path="/homeOfficer" element={<HomeOfficer />} />
+        <Route path="/file-fir" element={<FileFIR />} />
+        <Route path="/view-fir" element={<ViewFIR />} />
+        <Route path="/view-crime-dashboard" element={<ViewCrimeDashboard />} />
+        <Route path="/manage-complaints" element={<ManageComplaints />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route
+          path="/fir-confirmation"
+          element={
+            <RequireAuth role="citizen">
+              <FIRConfirmation />
+            </RequireAuth>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  </AuthProvider>
 );
 
 export default App;
