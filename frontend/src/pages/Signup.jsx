@@ -16,29 +16,37 @@ const Signup = () => {
   const onChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const submit = async (e) => {
+  const submit = async e => {
     e.preventDefault();
     const { name, email, password } = form;
     if (!name || !email || !password)
       return handleError('All fields are required');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/signup', {
+      const res = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role }),
       });
 
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Signup failed');
+      }
+
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || 'Signup failed');
+      const token = data.token;
 
-      localStorage.setItem('token', data.token);
+      // Store token and role in localStorage just like login
+      localStorage.setItem('token', token);
       localStorage.setItem('role', role);
-      localStorage.setItem('loggedInUser', form.name);
+      localStorage.setItem('loggedInUser', name);
 
-      handleSuccess(`${roles[role]} account created!`);
+      handleSuccess(`${roles[role]} account created and logged in!`);
+
       setTimeout(() => navigate(role === 'citizen' ? '/homeCitizen' : '/homeOfficer'), 800);
+
     } catch (err) {
       handleError(err.message);
     }
