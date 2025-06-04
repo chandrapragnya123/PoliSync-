@@ -5,7 +5,7 @@ import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import FileFIR from './pages/FileFIR';
 import RequireAuth from './components/RequireAuth';
-import FIRConfirmation from './pages/FIRconfirmationPage';
+import FIRConfirmation from './pages/FIRConfirmationPage';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
