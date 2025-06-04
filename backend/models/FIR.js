@@ -30,13 +30,17 @@ const FIRSchema = new mongoose.Schema({
     mainCategory: {
       type: String,
       required: true,
-      enum: ['Theft', 'Assault', 'Fraud', 'Cybercrime', 'Other']
-    },
+
+      enum: ['theft', 'assault', 'fraud', 'cybercrime', 'other', 'domestic violence', 'sexual assault', 'vandalism', 'drug-related','burglary', 'robbery', 'physical', 'verbal', 'financial', 'identity', 'hacking', 'online harassment','harassment', 'extortion', 'malware', 'phishing']
+    }, //mainCategory is required and must be one of the defined values using enum.
+
     subCategories: [{
       type: String,
-      enum: ['Burglary', 'Robbery', 'Physical', 'Verbal', 'Financial', 'Identity', 'Hacking', 'Online Harassment']
-    }],
-    customDescription: String
+      enum: ['burglary', 'robbery', 'physical', 'verbal', 'financial', 'identity', 'hacking', 'online harassment','harassment', 'extortion', 'malware', 'phishing', 'other']
+    }], //An array of subcategories, each restricted to specific crime types.
+
+    customDescription: String // Allows for a custom description if "Other" is selected.
+
   },
   incidentDetails: {
     date: { type: Date, required: true },

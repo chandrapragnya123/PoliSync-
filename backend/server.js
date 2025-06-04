@@ -47,14 +47,16 @@ mongoose.connect(process.env.MONGODB_URI , {
 // ------------------------------------
 const authRoutes = require('./routes/authRoutes');
 const firRoutes = require('./routes/firRoutes');
+// const filedCasesRoute = require('./routes/filedcases');
+const crimeClassifierRoute = require('./routes/crimeClassifier');
 const complaintRoutes = require('./routes/complaintRoutes');
-const filedCasesRoute = require('./routes/filedcases');
 
 // Register routes
 app.use('/api/auth', authRoutes);
 app.use('/api/firs', firRoutes);
+// app.use('/api/complaint', filedCasesRoute); // Make sure this does not conflict
+app.use('/api/classify-crime', crimeClassifierRoute);
 app.use('/api/complaints', complaintRoutes);
-app.use('/api/complaints', filedCasesRoute); // Make sure this does not conflict
 
 // Test route
 app.get('/api/test', (req, res) => {
@@ -64,12 +66,12 @@ app.get('/api/test', (req, res) => {
 // ------------------------------------
 // ✅ Serve React frontend (Production)
 // ------------------------------------
-const frontendPath = path.join(__dirname, '../frontend/build');
-app.use(express.static(frontendPath));
+// const frontendPath = path.join(__dirname, '../frontend/build');
+// app.use(express.static(frontendPath));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(frontendPath, 'index.html'));
+// });
 
 // ------------------------------------
 // ✅ Start server

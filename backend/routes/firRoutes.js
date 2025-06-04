@@ -1,62 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // you can configure destination and filename
+
+
+// Imports the FIR model and auth middleware
 const FIR = require('../models/FIR');
 const { auth, USER_ROLES } = require('../middleware/auth');
 
-// Multer setup for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // make sure this folder exists
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-const upload = multer({ storage });
-
-// Citizen submits FIR with optional files
-router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), async (req, res) => {
+// -----------------------------------------------------------------------------
+// Citizen submits FIR (POST /api/firs)
+router.post('/', auth([USER_ROLES.CITIZEN]), upload.single('evidence'), async (req, res) => {
   try {
-    // Parse nested JSON strings if sent as strings
-    const complainant = typeof req.body.complainant === 'string' ? JSON.parse(req.body.complainant) : req.body.complainant;
-    const incidentDetails = typeof req.body.incidentDetails === 'string' ? JSON.parse(req.body.incidentDetails) : req.body.incidentDetails;
-    const crimeType = typeof req.body.crimeType === 'string' ? JSON.parse(req.body.crimeType) : req.body.crimeType;
-
-    if (!complainant || !complainant.fullName || !complainant.email || !complainant.phoneNumber) {
-      return res.status(400).json({ error: 'Complainant details are incomplete' });
-    }
-    if (!crimeType || !crimeType.mainCategory) {
-      return res.status(400).json({ error: 'Crime type mainCategory is required' });
-    }
-    if (!incidentDetails || !incidentDetails.date || !incidentDetails.description) {
-      return res.status(400).json({ error: 'Incident details date and description are required' });
-    }
+    const parsedFirData = JSON.parse(req.body.firData);
 
     const firData = {
+      ...parsedFirData,
       createdBy: req.user._id,
-      complainant,
-      crimeType,
-      incidentDetails: {
-        ...incidentDetails,
-        evidence: []
-      },
-      status: 'Pending'
+      status: 'Submitted',
     };
 
-    if (req.files && req.files.length > 0) {
-      req.files.forEach(file => {
-        let fileType = 'other';
-        if (file.mimetype.startsWith('image/')) fileType = 'image';
-        else if (file.mimetype.startsWith('video/')) fileType = 'video';
-        else if (file.mimetype === 'application/pdf' || file.mimetype.includes('document')) fileType = 'document';
+    if (req.file) {
+      firData.evidence = {
+        fileName: req.file.originalname,
+        filePath: req.file.path,
+        mimeType: req.file.mimetype,
+        size: req.file.size
+      };
 
-        firData.incidentDetails.evidence.push({
-          type: fileType,
-          url: file.path,
-          description: ''
-        });
-      });
     }
 
     const fir = new FIR(firData);
@@ -67,12 +38,27 @@ router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), asyn
       firNumber: fir.firNumber
     });
   } catch (error) {
+    console.error('FIR submission error:', error);
     res.status(400).json({ error: error.message });
   }
 });
 
-// Police/Admin update FIR status (Accept or Reject)
-router.patch('/:id/status', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN]), async (req, res) => {
+
+// -----------------------------------------------------------------------------
+// Police views pending FIRs (GET /api/firs/pending)
+router.get('/pending', auth([USER_ROLES.POLICE]), async (req, res) => {
+  try {
+    const pendingFirs = await FIR.find({ status: 'Submitted' });
+    res.json(pendingFirs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// Police updates FIR status (PATCH /api/firs/:id/status)
+router.patch('/:id/status', auth([USER_ROLES.POLICE]), async (req, res) => {
+
   try {
     const { status, rejectionReason } = req.body;
 

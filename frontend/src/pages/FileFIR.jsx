@@ -72,40 +72,38 @@ const FileFIR = () => {
     setIsSubmitting(true);
     setError(null);
 
-    try {
-      const data = new FormData();
+    const data = new FormData();
 
-      const complainant = {
+    const complaintData = {
+      complainant: {
         fullName: formData.name,
         email: formData.email,
         phoneNumber: formData.phone,
-        address: formData.address,
-      };
-
-      const crimeType = {
-        mainCategory: formData.crimeType.length
-          ? formData.crimeType[0].charAt(0).toUpperCase() + formData.crimeType[0].slice(1)
-          : '',
-      };
-
-      const incidentDetails = {
+        address: {
+          street: formData.address
+        }
+      },
+      crimeType: {
+        mainCategory: formData.crimeType[0] || ''  // pick one or adapt for multi-label
+      },
+      incidentDetails: {
         date: formData.incidentDate,
-        location: formData.incidentLocation,
-        description: formData.description,
-      };
-
-      data.append('complainant', JSON.stringify(complainant));
-      data.append('crimeType', JSON.stringify(crimeType));
-      data.append('incidentDetails', JSON.stringify(incidentDetails));
-
-      if (formData.evidence) {
-        data.append('evidenceFiles', formData.evidence);
+        location: {
+          address: formData.incidentLocation
+        },
+        description: formData.description
       }
+    };
 
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('User not authenticated');
+    data.append('complaintData', JSON.stringify(complaintData));
 
-      const response = await fetch('http://localhost:5000/api/firs', {
+    if (formData.evidence) {
+      data.append('evidence', formData.evidence);
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/complaints', {
+
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

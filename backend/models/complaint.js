@@ -6,51 +6,31 @@ const complaintSchema = new mongoose.Schema({
     email: String,
     phoneNumber: String,
     address: {
-      street: String,
-      city: String,
-      state: String,
-      postalCode: String,
-      country: { type: String, default: 'India' }
+      street: String
     }
   },
   crimeType: {
     mainCategory: String,
-    subCategories: [String],
-    customDescription: String
+    subCategories: [String]
   },
   incidentDetails: {
     date: Date,
-    time: String,
     location: {
-      address: String,
-      landmark: String,
-      gpsCoordinates: {
-        lat: Number,
-        lng: Number
-      }
+      address: String
     },
-    description: String,
-    witnesses: [{
-      name: String,
-      contact: String,
-      statement: String
-    }],
-    evidence: [
-      {
-        type: String,
-        url: String,
-        description: String,
-        uploadedAt: Date
-      }
-    ]
+    description: String
   },
-  firNumber: { type: String, unique: true },
-  acceptedAt: { type: Date, default: Date.now },
-  assignedOfficer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  evidence: {
+    originalname: String,
+    mimetype: String,
+    buffer: Buffer
   },
-  createdAt: { type: Date, default: Date.now }
+  type: { type: String, default: 'web' },
+  status: { type: String, default: 'Not Allocated' },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+
 });
 
-module.exports = mongoose.model('Complaint', complaintSchema);
+module.exports = mongoose.models.Complaint || mongoose.model('Complaint', complaintSchema);

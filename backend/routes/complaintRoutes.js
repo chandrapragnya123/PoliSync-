@@ -1,20 +1,54 @@
-// routes/complaintRoutes.js
+// backend/routes/complaintRoutes.js
 
-//This line imports the Express framework, which is used to create and manage 
-// routes in a Node.js application.
-const express = require('express'); 
-
-// This creates a new router object using Express. The router will hold all the routes related to complaints. 
-// Think of it like a mini app inside your main app specifically for complaints.
+const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const Complaint = require('../models/Complaint'); // Adjust path if needed
 
-//This sets up a GET route for the base path / of this router. When a user accesses /complaints
-//  (assuming this file is mounted on /complaints), this function will run.
-//req is the request object.res is the response object.
-router.get('/', (req, res) => {
-  res.send('Complaints route working'); //This sends a plain text response saying "Complaints route working" to the client when they hit the route.
+// Configure multer for memory storage (evidence will be in req.file.buffer)
+const upload = multer({ storage: multer.memoryStorage() });
+
+// POST /api/complaint
+router.post('/', upload.fields([
+    { name: 'complaintData', maxCount: 1 },
+    { name: 'evidence', maxCount: 1 }
+  ]), async (req, res) => {
+    try {
+      const rawData = req.body.complaintData;
+
+      if (!rawData) {
+        return res.status(400).json({ message: 'Missing complaintData field in request' });
+      }
+
+      let complaintData;
+      try {
+        complaintData = JSON.parse(rawData);
+      } catch (parseErr) {
+        return res.status(400).json({
+          message: 'Invalid JSON in complaintData',
+          error: parseErr.message
+        });
+      }
+
+      const evidenceFile = req.files?.evidence?.[0];
+      const evidence = evidenceFile ? {
+        originalname: evidenceFile.originalname,
+        mimetype: evidenceFile.mimetype,
+        buffer: evidenceFile.buffer
+      } : null;
+
+      const complaint = new Complaint({
+        ...complaintData,
+        evidence
+      });
+
+      await complaint.save();
+      res.status(200).json({ message: 'Complaint submitted successfully' });
+    } catch (err) {
+      console.error('Complaint save error:', err);
+      res.status(500).json({ message: 'Failed to save complaint', error: err.message });
+    }
 });
-//This exports the router so it can be used in another file 
-// (typically in your main app file like server.js or app.js where you mount it using something like app.use('/complaints', complaintRoutes)).
+
 
 module.exports = router;
