@@ -11,14 +11,30 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// ------------------------------------
+// ✅ Middleware
+// ------------------------------------
+app.use(cors({
+  origin: 'http://localhost:3000', // frontend origin
+  credentials: true
+}));
 
-// Serve uploads folder statically
+// Handle preflight requests
+app.options('*', cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
+
+// Parse JSON and form data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// MongoDB connection
+// ------------------------------------
+// ✅ MongoDB connection
+// ------------------------------------
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/polisync', {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -26,29 +42,38 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/polisync'
 .then(() => console.log('✅ MongoDB connected'))
 .catch(err => console.error('❌ MongoDB connection failed:', err));
 
-// Route imports
+// ------------------------------------
+// ✅ Routes
+// ------------------------------------
 const authRoutes = require('./routes/authRoutes');
 const firRoutes = require('./routes/firRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
 const filedCasesRoute = require('./routes/filedcases');
 
-// Route registration
+// Register routes
 app.use('/api/auth', authRoutes);
 app.use('/api/firs', firRoutes);
 app.use('/api/complaints', complaintRoutes);
-app.use('/api/complaints', filedCasesRoute); // If needed, adjust to avoid duplicate paths
+app.use('/api/complaints', filedCasesRoute); // Make sure this does not conflict
 
-// Simple test route
+// Test route
 app.get('/api/test', (req, res) => {
-  res.send('Server is running!');
+  res.send('✅ Server is running!');
 });
 
-// For React Router (catch-all route)
-// Serve React frontend in production
-app.use(express.static(path.join(__dirname, '../frontend/build')));
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+// ------------------------------------
+// ✅ Serve React frontend (Production)
+// ------------------------------------
+const frontendPath = path.join(__dirname, '../frontend/build');
+app.use(express.static(frontendPath));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// Start server
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// ------------------------------------
+// ✅ Start server
+// ------------------------------------
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});

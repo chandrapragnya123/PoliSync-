@@ -5,6 +5,7 @@ import { handleError, handleSuccess } from '../utils';
 import logo from '../assets/logo.png';
 import '../styles/Login.css';
 
+
 const roles = { citizen: 'Citizen', officer: 'Officer' };
 
 const Signup = () => {
