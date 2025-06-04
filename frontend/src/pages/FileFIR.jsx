@@ -50,18 +50,36 @@ const FileFIR = () => {
     setError(null);
 
     const data = new FormData();
-    data.append('name', formData.name);
-    data.append('email', formData.email);
-    data.append('phone', formData.phone);
-    data.append('address', formData.address);
-    data.append('incidentDate', formData.incidentDate);
-    data.append('incidentLocation', formData.incidentLocation);
-    data.append('description', formData.description);
-    formData.crimeType.forEach((type) => data.append('crimeTypes', type));
-    if (formData.evidence) data.append('evidence', formData.evidence);
+
+    const complaintData = {
+      complainant: {
+        fullName: formData.name,
+        email: formData.email,
+        phoneNumber: formData.phone,
+        address: {
+          street: formData.address
+        }
+      },
+      crimeType: {
+        mainCategory: formData.crimeType[0] || ''  // pick one or adapt for multi-label
+      },
+      incidentDetails: {
+        date: formData.incidentDate,
+        location: {
+          address: formData.incidentLocation
+        },
+        description: formData.description
+      }
+    };
+
+    data.append('complaintData', JSON.stringify(complaintData));
+
+    if (formData.evidence) {
+      data.append('evidence', formData.evidence);
+    }
 
     try {
-      const response = await fetch('http://localhost:5000/api/complaints/file', {
+      const response = await fetch('http://localhost:5000/api/complaints', {
         method: 'POST',
         body: data,
       });

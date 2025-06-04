@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // you can configure destination and filename
+
 
 // Imports the FIR model and auth middleware
 const FIR = require('../models/FIR');
@@ -7,16 +10,24 @@ const { auth, USER_ROLES } = require('../middleware/auth');
 
 // -----------------------------------------------------------------------------
 // Citizen submits FIR (POST /api/firs)
-router.post('/', auth([USER_ROLES.CITIZEN]), async (req, res) => {
+router.post('/', auth([USER_ROLES.CITIZEN]), upload.single('evidence'), async (req, res) => {
   try {
+    const parsedFirData = JSON.parse(req.body.firData);
+
     const firData = {
-      ...req.body,
+      ...parsedFirData,
       createdBy: req.user._id,
-      complainant: {
-        ...req.body.complainant
-      },
-      status: 'Submitted'
+      status: 'Submitted',
     };
+
+    if (req.file) {
+      firData.evidence = {
+        fileName: req.file.originalname,
+        filePath: req.file.path,
+        mimeType: req.file.mimetype,
+        size: req.file.size
+      };
+    }
 
     const fir = new FIR(firData);
     await fir.save();
@@ -26,9 +37,11 @@ router.post('/', auth([USER_ROLES.CITIZEN]), async (req, res) => {
       firNumber: fir.firNumber
     });
   } catch (error) {
+    console.error('FIR submission error:', error);
     res.status(400).json({ error: error.message });
   }
 });
+
 
 // -----------------------------------------------------------------------------
 // Police views pending FIRs (GET /api/firs/pending)
