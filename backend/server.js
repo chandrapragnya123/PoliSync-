@@ -14,10 +14,7 @@ const PORT = process.env.PORT || 5000;
 // ------------------------------------
 // ✅ Middleware
 // ------------------------------------
-app.use(cors({
-  origin: 'http://localhost:3000', // frontend origin
-  credentials: true
-}));
+app.use(cors());
 
 // Handle preflight requests
 app.options('*', cors({
@@ -35,7 +32,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ------------------------------------
 // ✅ MongoDB connection
 // ------------------------------------
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/polisync', {
+mongoose.connect(process.env.MONGODB_URI , {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
