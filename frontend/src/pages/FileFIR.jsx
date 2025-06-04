@@ -10,10 +10,20 @@ const FileFIR = () => {
     name: '',
     email: '',
     phone: '',
-    address: '',
+    address: {
+      street: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'India',
+    },
     crimeType: [],
     incidentDate: '',
-    incidentLocation: '',
+    incidentLocation: {
+      address: '',
+      landmark: '',
+      gpsCoordinates: { lat: '', lng: '' },
+    },
     description: '',
     evidence: null,
   });
@@ -36,6 +46,19 @@ const FileFIR = () => {
         ...prev,
         evidence: files[0],
       }));
+    } else if (name.includes('.')) {
+      // Handle nested object keys like address.street or incidentLocation.address
+      const keys = name.split('.');
+      setFormData((prev) => {
+        let obj = { ...prev };
+        let temp = obj;
+        for (let i = 0; i < keys.length - 1; i++) {
+          temp[keys[i]] = { ...temp[keys[i]] };
+          temp = temp[keys[i]];
+        }
+        temp[keys[keys.length - 1]] = value;
+        return obj;
+      });
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -80,7 +103,11 @@ const FileFIR = () => {
 
     try {
       const response = await fetch('http://localhost:5000/api/complaints', {
+
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: data,
       });
 
@@ -89,7 +116,7 @@ const FileFIR = () => {
       if (response.ok) {
         navigate('/fir-confirmation', { state: { firNumber: result.firNumber || 'N/A' } });
       } else {
-        throw new Error(result.message || 'Submission failed.');
+        throw new Error(result.error || 'Submission failed.');
       }
     } catch (err) {
       console.error('Error submitting FIR:', err);
@@ -102,7 +129,7 @@ const FileFIR = () => {
   return (
     <div className="form-container">
       <div className="form-wrapper">
-        <form className="filefir-form" onSubmit={handleSubmit}>
+        <form className="filefir-form" onSubmit={handleSubmit} encType="multipart/form-data">
           <h1 className="main-heading">
             <FileText size={28} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
             File an FIR
@@ -111,17 +138,90 @@ const FileFIR = () => {
           {error && <div className="error-message">{error}</div>}
 
           <h2 className="section-heading">Personal Information</h2>
+
           <label htmlFor="name">Full Name:</label>
-          <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="Enter your full name" />
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            placeholder="Enter your full name"
+          />
 
           <label htmlFor="email">Email Address:</label>
-          <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter your email address" />
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder="Enter your email address"
+          />
 
           <label htmlFor="phone">Phone Number:</label>
-          <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} required placeholder="Enter your phone number" />
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            placeholder="Enter your phone number"
+          />
 
-          <label htmlFor="address">Address:</label>
-          <textarea id="address" name="address" value={formData.address} onChange={handleChange} required placeholder="Enter your current address"></textarea>
+          <h3>Address Details</h3>
+          <label>Street:</label>
+          <input
+            type="text"
+            name="address.street"
+            value={formData.address.street}
+            onChange={handleChange}
+            required
+            placeholder="Street address"
+          />
+
+          <label>City:</label>
+          <input
+            type="text"
+            name="address.city"
+            value={formData.address.city}
+            onChange={handleChange}
+            required
+            placeholder="City"
+          />
+
+          <label>State:</label>
+          <input
+            type="text"
+            name="address.state"
+            value={formData.address.state}
+            onChange={handleChange}
+            required
+            placeholder="State"
+          />
+
+          <label>Postal Code:</label>
+          <input
+            type="text"
+            name="address.postalCode"
+            value={formData.address.postalCode}
+            onChange={handleChange}
+            required
+            placeholder="Postal Code"
+          />
+
+          <label>Country:</label>
+          <input
+            type="text"
+            name="address.country"
+            value={formData.address.country}
+            onChange={handleChange}
+            required
+            placeholder="Country"
+          />
 
           <h2 className="section-heading">Type of Crime</h2>
           <button
@@ -157,18 +257,73 @@ const FileFIR = () => {
           </div>
 
           <h2 className="section-heading">Incident Details</h2>
-          <label htmlFor="incidentDate">Date of Incident:</label>
-          <input type="date" id="incidentDate" name="incidentDate" value={formData.incidentDate} onChange={handleChange} required />
 
-          <label htmlFor="incidentLocation">Location of Incident:</label>
-          <input type="text" id="incidentLocation" name="incidentLocation" value={formData.incidentLocation} onChange={handleChange} required placeholder="Enter the location of the incident" />
+          <label htmlFor="incidentDate">Date of Incident:</label>
+          <input
+            type="date"
+            id="incidentDate"
+            name="incidentDate"
+            value={formData.incidentDate}
+            onChange={handleChange}
+            required
+          />
+
+          <label>Incident Location Address:</label>
+          <input
+            type="text"
+            name="incidentLocation.address"
+            value={formData.incidentLocation.address}
+            onChange={handleChange}
+            required
+            placeholder="Location of the incident"
+          />
+
+          <label>Landmark:</label>
+          <input
+            type="text"
+            name="incidentLocation.landmark"
+            value={formData.incidentLocation.landmark}
+            onChange={handleChange}
+            placeholder="Landmark near incident location"
+          />
+
+          <h3>GPS Coordinates (Optional)</h3>
+          <label>Latitude:</label>
+          <input
+            type="text"
+            name="incidentLocation.gpsCoordinates.lat"
+            value={formData.incidentLocation.gpsCoordinates.lat}
+            onChange={handleChange}
+            placeholder="Latitude"
+          />
+
+          <label>Longitude:</label>
+          <input
+            type="text"
+            name="incidentLocation.gpsCoordinates.lng"
+            value={formData.incidentLocation.gpsCoordinates.lng}
+            onChange={handleChange}
+            placeholder="Longitude"
+          />
 
           <label htmlFor="description">Description of Incident:</label>
-          <textarea id="description" name="description" value={formData.description} onChange={handleChange} required placeholder="Describe the incident in detail"></textarea>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            required
+            placeholder="Describe the incident in detail"
+          ></textarea>
 
           <h2 className="section-heading">Upload Evidence</h2>
           <label htmlFor="evidence">Upload Evidence File:</label>
-          <input type="file" name="evidence" accept=".png,.jpg,.jpeg,.pdf,.doc,.docx" onChange={handleChange} />
+          <input
+            type="file"
+            name="evidence"
+            accept=".png,.jpg,.jpeg,.pdf,.doc,.docx"
+            onChange={handleChange}
+          />
 
           <button type="submit" className="submit-btn" disabled={isSubmitting}>
             <Send size={18} style={{ marginRight: '6px', verticalAlign: 'middle' }} />

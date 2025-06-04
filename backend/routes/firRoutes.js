@@ -27,6 +27,7 @@ router.post('/', auth([USER_ROLES.CITIZEN]), upload.single('evidence'), async (r
         mimeType: req.file.mimetype,
         size: req.file.size
       };
+
     }
 
     const fir = new FIR(firData);
@@ -57,39 +58,34 @@ router.get('/pending', auth([USER_ROLES.POLICE]), async (req, res) => {
 // -----------------------------------------------------------------------------
 // Police updates FIR status (PATCH /api/firs/:id/status)
 router.patch('/:id/status', auth([USER_ROLES.POLICE]), async (req, res) => {
+
   try {
     const { status, rejectionReason } = req.body;
 
-    if (!['Under Investigation', 'Rejected'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status' });
+    if (!['Accepted', 'Rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status value. Must be Accepted or Rejected.' });
     }
 
-    const update = {
-      status,
-      assignedOfficer: req.user._id,
-      updatedAt: new Date()
-    };
+    const fir = await FIR.findById(req.params.id);
+    if (!fir) return res.status(404).json({ error: 'FIR not found' });
 
-    if (status === 'Rejected') {
-      update.statusMessage = rejectionReason || 'FIR request declined';
-    } else {
-      update.statusMessage = 'FIR approved and under investigation';
+    fir.status = status;
+    fir.actionedBy = req.user._id;
+
+    if (status === 'Rejected' && (!rejectionReason || rejectionReason.trim() === '')) {
+      return res.status(400).json({ error: 'Rejection reason required for rejected FIR' });
     }
+    fir.rejectionReason = status === 'Rejected' ? rejectionReason : '';
 
-    const fir = await FIR.findByIdAndUpdate(req.params.id, update, { new: true });
+    await fir.save();
 
-    if (!fir) {
-      return res.status(404).json({ error: 'FIR not found' });
-    }
-
-    res.json(fir);
+    res.json({ message: `FIR ${status.toLowerCase()} successfully`, fir });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
-// -----------------------------------------------------------------------------
-// Citizen views their FIRs (GET /api/firs/my-firs)
+// Citizen views their own FIRs
 router.get('/my-firs', auth([USER_ROLES.CITIZEN]), async (req, res) => {
   try {
     const firs = await FIR.find({ createdBy: req.user._id }).sort({ createdAt: -1 });
@@ -99,29 +95,31 @@ router.get('/my-firs', auth([USER_ROLES.CITIZEN]), async (req, res) => {
   }
 });
 
-// -----------------------------------------------------------------------------
-// Police views approved FIRs (GET /api/firs/approved)
+// Police views approved FIRs
 router.get('/approved', auth([USER_ROLES.POLICE]), async (req, res) => {
   try {
-    const approvedFirs = await FIR.find({ status: 'Under Investigation' });
+    const approvedFirs = await FIR.find({ status: 'Accepted' });
     res.json(approvedFirs);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// -----------------------------------------------------------------------------
-// Police/Admin views all FIRs (GET /api/firs)
-// Optional: you can add auth here if you want only certain roles to access this
+// Police/Admin views all FIRs
 router.get('/', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN]), async (req, res) => {
   try {
-    const firs = await FIR.find({}, {
-      'complainant.fullName': 1,
-      'incidentDetails.description': 1,
-      'incidentDetails.date': 1,
-      'crimeType.mainCategory': 1,
-      'status': 1,
-    }).lean();
+    const firs = await FIR.find({})
+      .populate('assignedOfficer', 'name')
+      .select({
+        'complainant.fullName': 1,
+        'incidentDetails.description': 1,
+        'incidentDetails.date': 1,
+        'crimeType.mainCategory': 1,
+        status: 1,
+        rejectionReason: 1,
+        assignedOfficer: 1
+      })
+      .lean();
 
     res.json(firs);
   } catch (error) {
@@ -129,4 +127,37 @@ router.get('/', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN]), async (req, res) =>
   }
 });
 
+// Get specific FIR by ID with access control
+router.get('/:id', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN, USER_ROLES.CITIZEN]), async (req, res) => {
+  try {
+    const fir = await FIR.findById(req.params.id)
+      .populate('assignedOfficer', 'name')
+      .populate('createdBy', 'name');
+
+    if (!fir) return res.status(404).json({ error: 'FIR not found' });
+
+    // Only creator or Police/Admin can view
+    if (req.user.role === USER_ROLES.CITIZEN && fir.createdBy._id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    res.json(fir);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
+
+
+// POST /api/firs — citizen submits new FIR
+
+// PATCH /api/firs/:id/status — police/admin updates FIR status and rejection reason
+
+// GET /api/firs/my-firs — citizen gets own FIRs
+
+// GET /api/firs/approved — police gets accepted FIRs
+
+// GET /api/firs/ — police/admin get all FIRs
+
+// GET /api/firs/:id — get FIR details with access control

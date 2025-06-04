@@ -30,6 +30,7 @@ const complaintSchema = new mongoose.Schema({
   status: { type: String, default: 'Not Allocated' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
+
 });
 
 module.exports = mongoose.models.Complaint || mongoose.model('Complaint', complaintSchema);
