@@ -5,7 +5,7 @@ import { handleError, handleSuccess } from '../utils';
 import logo from '../assets/logo.png';
 import '../styles/Login.css';
 
-const roles = { citizen: 'Citizen', officer: 'Officer' };
+const roles = { citizen: 'Citizen', police: 'Police' };
 
 const Login = () => {
   const [role, setRole] = useState('citizen'); // toggle state
@@ -21,7 +21,7 @@ const Login = () => {
     if (!email || !password) return handleError('Email and password are required');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

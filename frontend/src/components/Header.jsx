@@ -37,7 +37,7 @@ const Header = () => {
         <li><Link to="/file-fir">Request FIR</Link></li>
       </>
     );
-  else if (role === ROLES.OFFICER)
+  else if (role === ROLES.POLICE)
     extraLinks = (
       <>
         <li><Link to="/view-crime-dashboard">Dashboard</Link></li>

@@ -2,36 +2,31 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const FIR = require('../models/FIR');
+const Complaint = require('../models/Complaint');
 const { auth, USER_ROLES } = require('../middleware/auth');
 
-// Multer setup for file uploads
+// Multer setup
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // make sure this folder exists
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage });
 
-// Citizen submits FIR with optional files
+// Citizen submits FIR
 router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), async (req, res) => {
   try {
-    // Parse nested JSON strings if sent as strings
     const complainant = typeof req.body.complainant === 'string' ? JSON.parse(req.body.complainant) : req.body.complainant;
     const incidentDetails = typeof req.body.incidentDetails === 'string' ? JSON.parse(req.body.incidentDetails) : req.body.incidentDetails;
     const crimeType = typeof req.body.crimeType === 'string' ? JSON.parse(req.body.crimeType) : req.body.crimeType;
 
-    if (!complainant || !complainant.fullName || !complainant.email || !complainant.phoneNumber) {
+    if (!complainant?.fullName || !complainant?.email || !complainant?.phoneNumber)
       return res.status(400).json({ error: 'Complainant details are incomplete' });
-    }
-    if (!crimeType || !crimeType.mainCategory) {
+
+    if (!crimeType?.mainCategory)
       return res.status(400).json({ error: 'Crime type mainCategory is required' });
-    }
-    if (!incidentDetails || !incidentDetails.date || !incidentDetails.description) {
+
+    if (!incidentDetails?.date || !incidentDetails?.description)
       return res.status(400).json({ error: 'Incident details date and description are required' });
-    }
 
     const firData = {
       createdBy: req.user._id,
@@ -44,7 +39,7 @@ router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), asyn
       status: 'Pending'
     };
 
-    if (req.files && req.files.length > 0) {
+    if (req.files?.length > 0) {
       req.files.forEach(file => {
         let fileType = 'other';
         if (file.mimetype.startsWith('image/')) fileType = 'image';
@@ -54,7 +49,8 @@ router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), asyn
         firData.incidentDetails.evidence.push({
           type: fileType,
           url: file.path,
-          description: ''
+          description: '',
+          uploadedAt: new Date()
         });
       });
     }
@@ -62,16 +58,13 @@ router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), asyn
     const fir = new FIR(firData);
     await fir.save();
 
-    res.status(201).json({
-      message: 'FIR submitted successfully',
-      firNumber: fir.firNumber
-    });
+    res.status(201).json({ message: 'FIR submitted successfully', firNumber: fir.firNumber });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
 
-// Police/Admin update FIR status (Accept or Reject)
+// Police/Admin updates FIR status
 router.patch('/:id/status', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN]), async (req, res) => {
   try {
     const { status, rejectionReason } = req.body;
@@ -86,14 +79,47 @@ router.patch('/:id/status', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN]), async (
     fir.status = status;
     fir.actionedBy = req.user._id;
 
-    if (status === 'Rejected' && (!rejectionReason || rejectionReason.trim() === '')) {
-      return res.status(400).json({ error: 'Rejection reason required for rejected FIR' });
+    if (status === 'Rejected') {
+      if (!rejectionReason?.trim()) {
+        return res.status(400).json({ error: 'Rejection reason required for rejected FIR' });
+      }
+      fir.rejectionReason = rejectionReason;
+      await fir.save();
+      return res.status(200).json({ message: 'FIR rejected successfully' });
     }
-    fir.rejectionReason = status === 'Rejected' ? rejectionReason : '';
 
-    await fir.save();
+    if (status === 'Accepted') {
+      fir.rejectionReason = '';
+      fir.assignedOfficer = fir.assignedOfficer || req.user._id;
+      await fir.save();
 
-    res.json({ message: `FIR ${status.toLowerCase()} successfully`, fir });
+      try {
+        const existingComplaint = await Complaint.findOne({ firNumber: fir.firNumber });
+        if (!existingComplaint) {
+          const complaintData = {
+            complainant: fir.complainant,
+            crimeType: fir.crimeType,
+            incidentDetails: fir.incidentDetails,
+            firNumber: fir.firNumber,
+            acceptedAt: new Date(),
+            assignedOfficer: fir.assignedOfficer,
+            createdAt: fir.createdAt
+          };
+          const complaint = new Complaint(complaintData);
+          await complaint.save();
+          console.log(`Complaint created successfully for FIR number: ${fir.firNumber}`);  // Log success
+        } else {
+          console.log(`Complaint already exists for FIR number: ${fir.firNumber}`);  // Log if complaint exists
+        }
+        
+
+        return res.status(200).json({ message: 'FIR accepted and complaint created successfully' });
+      } catch (err) {
+        console.error('Complaint creation failed:', err);
+        return res.status(500).json({ error: 'Complaint creation failed after FIR acceptance' });
+      }
+    }
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -119,7 +145,7 @@ router.get('/approved', auth([USER_ROLES.POLICE]), async (req, res) => {
   }
 });
 
-// Police/Admin views all FIRs
+// Police/Admin views all FIRs (summary)
 router.get('/', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN]), async (req, res) => {
   try {
     const firs = await FIR.find({})
@@ -150,7 +176,6 @@ router.get('/:id', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN, USER_ROLES.CITIZEN
 
     if (!fir) return res.status(404).json({ error: 'FIR not found' });
 
-    // Only creator or Police/Admin can view
     if (req.user.role === USER_ROLES.CITIZEN && fir.createdBy._id.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
@@ -162,16 +187,3 @@ router.get('/:id', auth([USER_ROLES.POLICE, USER_ROLES.ADMIN, USER_ROLES.CITIZEN
 });
 
 module.exports = router;
-
-
-// POST /api/firs — citizen submits new FIR
-
-// PATCH /api/firs/:id/status — police/admin updates FIR status and rejection reason
-
-// GET /api/firs/my-firs — citizen gets own FIRs
-
-// GET /api/firs/approved — police gets accepted FIRs
-
-// GET /api/firs/ — police/admin get all FIRs
-
-// GET /api/firs/:id — get FIR details with access control
