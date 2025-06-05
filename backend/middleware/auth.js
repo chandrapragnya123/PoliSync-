@@ -25,6 +25,7 @@ const auth = (allowedRoles = []) => {
       if (!user) {
         return res.status(401).json({ error: 'User not found' });
       }
+      console.log("🔐 Authenticated user role:", user.role);
 
       // Check if user role is allowed (if roles specified)
       if (allowedRoles.length && !allowedRoles.includes(user.role)) {
@@ -49,5 +50,8 @@ const auth = (allowedRoles = []) => {
     }
   };
 };
+
+
+
 
 module.exports = { auth, USER_ROLES };

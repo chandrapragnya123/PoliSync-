@@ -16,7 +16,7 @@ const Footer = () => {
         <li><a href="/dashboard">Crime Dashboard</a></li>
       </>
     );
-  else if (role === ROLES.OFFICER)
+  else if (role === ROLES.POLICE)
     pageLinks = (
       <>
         <li><a href="/view-crime-dashboard">Dashboard</a></li>
