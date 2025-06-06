@@ -1,4 +1,3 @@
-// components/Header.jsx
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
@@ -9,7 +8,6 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // re‑render when role changes in another tab
     const onStorage = () => setRole(getRole());
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
@@ -21,11 +19,21 @@ const Header = () => {
     navigate('/');
   };
 
-  /* ---------- menus per role ---------- */
+  const navButtonStyle = {
+    backgroundColor: 'transparent',
+    color: 'white',
+    padding: '8px 16px',
+    marginRight: '12px',
+    border: 'none',
+    borderRadius: '8px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+  };
+
   const commonLinks = (
     <>
-      <li><button onClick={() => navigate('/')} className="nav-btn">Home</button></li>
-      <li><button onClick={() => navigate('/about')} className="nav-btn">About Us</button></li>
+      <li><button onClick={() => navigate('/')} style={navButtonStyle}>Home</button></li>
+      <li><button onClick={() => navigate('/about')} style={navButtonStyle}>About Us</button></li>
     </>
   );
 
@@ -33,20 +41,19 @@ const Header = () => {
   if (role === ROLES.CITIZEN)
     extraLinks = (
       <>
-        <li><Link to="/my-complaints">My Complaints</Link></li>
-        <li><Link to="/file-fir">Request FIR</Link></li>
+        <li><Link to="/my-complaints" style={navButtonStyle}>My Complaints</Link></li>
+        <li><Link to="/file-fir" style={navButtonStyle}>Request FIR</Link></li>
       </>
     );
   else if (role === ROLES.POLICE)
     extraLinks = (
       <>
-        <li><Link to="/view-crime-dashboard">Dashboard</Link></li>
-        <li><Link to="/view-fir">FIR's</Link></li>
-        <li><Link to="/manage-complaints">Complaints</Link></li>
+        <li><Link to="/view-crime-dashboard" style={navButtonStyle}>Dashboard</Link></li>
+        <li><Link to="/view-fir" style={navButtonStyle}>FIR's</Link></li>
+        <li><Link to="/manage-complaints" style={navButtonStyle}>Complaints</Link></li>
       </>
     );
 
-  /* ---------- auth buttons ---------- */
   const authArea =
     role === ROLES.NONE ? (
       <>

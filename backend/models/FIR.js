@@ -30,17 +30,13 @@ const FIRSchema = new mongoose.Schema({
     mainCategory: {
       type: String,
       required: true,
-
       enum: ['theft', 'assault', 'fraud', 'cybercrime', 'other', 'domestic violence', 'sexual assault', 'vandalism', 'drug-related','burglary', 'robbery', 'physical', 'verbal', 'financial', 'identity', 'hacking', 'online harassment','harassment', 'extortion', 'malware', 'phishing']
-    }, //mainCategory is required and must be one of the defined values using enum.
-
+    },
     subCategories: [{
       type: String,
       enum: ['burglary', 'robbery', 'physical', 'verbal', 'financial', 'identity', 'hacking', 'online harassment','harassment', 'extortion', 'malware', 'phishing', 'other']
-    }], //An array of subcategories, each restricted to specific crime types.
-
-    customDescription: String // Allows for a custom description if "Other" is selected.
-
+    }],
+    customDescription: String
   },
   incidentDetails: {
     date: { type: Date, required: true },
@@ -62,7 +58,7 @@ const FIRSchema = new mongoose.Schema({
     evidence: [
       {
         type: { type: String, enum: ['image', 'video', 'document', 'other'] },
-        url: String,               // path or URL to uploaded file
+        url: String,
         description: String,
         uploadedAt: { type: Date, default: Date.now }
       }
@@ -77,10 +73,8 @@ const FIRSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  rejectionReason: {
-    type: String
-  },
-  firNumber: { type: String, unique: true },
+  rejectionReason: String,
+  firNumber: { type: String , default: undefined }, // removed `unique: true`
   assignedOfficer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
@@ -89,18 +83,26 @@ const FIRSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   }
 });
 
 FIRSchema.pre('save', function(next) {
-  if (!this.firNumber) {
+  if (!this.firNumber && this.status === 'Accepted') {
     const year = new Date().getFullYear();
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     this.firNumber = `FIR/${year}/${randomNum}`;
   }
   this.updatedAt = new Date();
+  next();
+});
+// Add this line before exporting
+FIRSchema.index({ firNumber: 1 }, { unique: true, sparse: true });
+// Ensure null is never stored accidentally
+FIRSchema.pre('validate', function(next) {
+  if (this.firNumber === null) {
+    this.firNumber = undefined;
+  }
   next();
 });
 

@@ -136,13 +136,13 @@ const Chatbot = ({ onClose }) => {
         console.log(`${key}:`, value);
       }
       formData.append('complaintData', JSON.stringify(complaintPayload));
-      if(file) formData.append('evidence', file); // optional
+      if (file) formData.append('evidence', file); // optional
 
       const token = localStorage.getItem('token');
       const res = await fetch('http://localhost:5000/api/complaints', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
           // Note: Don't set Content-Type header when sending FormData; browser sets it automatically
         },
         body: formData

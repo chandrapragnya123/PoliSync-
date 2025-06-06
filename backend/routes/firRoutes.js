@@ -1,26 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const FIR = require('../models/FIR');
+const Complaint = require('../models/Complaint');
+const Officer = require('../models/User'); // Assuming Officer is also in User model
+const { auth, USER_ROLES } = require('../middleware/auth');
 
-// Multer setup (move this to the top and define once)
+// ------------------ MULTER CONFIG ------------------
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage });
 
-// Imports the FIR model and auth middleware
-const FIR = require('../models/FIR');
-const Complaint = require('../models/Complaint');
-const { auth, USER_ROLES } = require('../middleware/auth');
-
-// -----------------------------------------------------------------------------
-// Citizen submits FIR (POST /api/firs)
-router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), async (req, res) => {
+// ------------------ SUBMIT FIR (CITIZEN) ------------------
+router.post('/', upload.array('evidenceFiles'), async (req, res) => {
   try {
-    const complainant = typeof req.body.complainant === 'string' ? JSON.parse(req.body.complainant) : req.body.complainant;
-    const incidentDetails = typeof req.body.incidentDetails === 'string' ? JSON.parse(req.body.incidentDetails) : req.body.incidentDetails;
-    const crimeType = typeof req.body.crimeType === 'string' ? JSON.parse(req.body.crimeType) : req.body.crimeType;
+    const complaintData = typeof req.body.complaintData === 'string'
+  ? JSON.parse(req.body.complaintData)
+  : req.body.complaintData;
+
+const complainant = complaintData.complainant;
+const incidentDetails = complaintData.incidentDetails;
+const crimeType = complaintData.crimeType;
 
     if (!complainant?.fullName || !complainant?.email || !complainant?.phoneNumber)
       return res.status(400).json({ error: 'Complainant details are incomplete' });
@@ -38,8 +40,8 @@ router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), asyn
         evidence: [],
       },
       crimeType,
-      createdBy: req.user._id,
-      status: 'Submitted',
+      createdBy: req.user?._id || null,
+      status: 'Pending',
     };
 
     if (req.files?.length > 0) {
@@ -61,9 +63,85 @@ router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), asyn
     const fir = new FIR(firData);
     await fir.save();
 
-    res.status(201).json({ message: 'FIR submitted successfully', firNumber: fir.firNumber });
+    res.status(201).json({ message: 'FIR submitted successfully', fir });
   } catch (error) {
     console.error('FIR submission error:', error);
     res.status(400).json({ error: error.message });
   }
 });
+
+// ------------------ GET ALL FIRs ------------------
+router.get('/', async (req, res) => {
+  try {
+    const firs = await FIR.find().sort({ createdAt: -1 });
+    res.json(firs);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch FIRs' });
+  }
+});
+
+// ------------------ GET FIR BY ID ------------------
+router.get('/:id', async (req, res) => {
+  try {
+    const fir = await FIR.findById(req.params.id);
+    if (!fir) return res.status(404).json({ error: 'FIR not found' });
+    res.json(fir);
+  } catch (error) {
+    console.error('Error fetching FIR:', error);
+    res.status(500).json({ error: 'Failed to fetch FIR detail' });
+  }
+});
+
+// ------------------ OFFICER ACTION: ACCEPT/REJECT ------------------
+router.patch('/:id/status', async (req, res) => {
+  try {
+    // Helper function to normalize the status value
+    const normalizeStatus = (status) => {
+      if (!status) return null;
+      const s = status.toLowerCase();
+      if (['pending', 'accepted', 'rejected'].includes(s)) {
+        return s.charAt(0).toUpperCase() + s.slice(1);
+      }
+      return null;
+    };
+
+    const cleanStatus = normalizeStatus(req.body.status);
+    const { rejectionReason } = req.body;
+    const officerId = req.user?._id;
+
+    if (!cleanStatus) {
+      return res.status(400).json({ error: 'Invalid status value' });
+    }
+
+    const fir = await FIR.findById(req.params.id);
+    if (!fir) return res.status(404).json({ error: 'FIR not found' });
+
+    fir.status = cleanStatus;
+    fir.actionedBy = officerId;
+    if (cleanStatus === 'Rejected') fir.rejectionReason = rejectionReason;
+
+    await fir.save();
+
+    if (cleanStatus === 'Accepted') {
+      const complaint = new Complaint({
+        firId: fir._id,
+        complainant: fir.complainant,
+        incidentDetails: fir.incidentDetails,
+        crimeType: fir.crimeType,
+        officer: officerId,
+        status: 'Open',
+        createdAt: new Date(),
+      });
+      await complaint.save();
+    }
+
+    res.json({ message: `FIR ${cleanStatus.toLowerCase()} successfully`, fir });
+  } catch (err) {
+    console.error('Status update error:', err);
+    res.status(500).json({ error: 'Action failed' });
+  }
+});
+
+
+
+module.exports = router;

@@ -6,13 +6,15 @@ export default function FIRTable() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedFir, setSelectedFir] = useState(null);
+    const [filterStatus, setFilterStatus] = useState('All');
 
     useEffect(() => {
-        fetch('/api/firs', {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-        })
+        loadFIRs();
+    }, []);
+
+    const loadFIRs = () => {
+        setLoading(true);
+        fetch('/api/firs')
             .then((res) => {
                 if (!res.ok) throw new Error('Failed to fetch');
                 return res.json();
@@ -25,15 +27,12 @@ export default function FIRTable() {
                 setError(err.message);
                 setLoading(false);
             });
-    }, []);
+    };
+
 
     const fetchFirDetail = async (firId) => {
         try {
-            const res = await fetch(`/api/firs/${firId}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
+            const res = await fetch(`/api/firs/${firId}`);
             if (!res.ok) throw new Error('Failed to fetch FIR detail');
             const data = await res.json();
             setSelectedFir(data);
@@ -51,13 +50,9 @@ export default function FIRTable() {
             try {
                 const res = await fetch(`/api/firs/${selectedFir._id}/status`, {
                     method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: 'Rejected', rejectionReason: reason }),
                 });
-                console.log('Rejection response status:', res.status);
                 if (!res.ok) {
                     const errorText = await res.text();
                     throw new Error(`Rejection failed: ${res.status} ${errorText}`);
@@ -65,36 +60,34 @@ export default function FIRTable() {
                 const data = await res.json();
                 alert('FIR rejected: ' + (data.message || 'Success'));
                 setSelectedFir(null);
-                window.location.reload();
+                loadFIRs();
+
             } catch (err) {
-                console.error('Error during rejection:', err);
                 alert(err.message);
             }
         } else if (action === 'Accepted') {
             try {
                 const res = await fetch(`/api/firs/${selectedFir._id}/status`, {
                     method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: 'Accepted' }),
                 });
-                console.log('Acceptance response status:', res.status);
                 if (!res.ok) {
                     const errorText = await res.text();
                     throw new Error(`Acceptance failed: ${res.status} ${errorText}`);
                 }
                 const data = await res.json();
-                alert('FIR accepted and moved to complaints: ' + (data.message || 'Success'));
+                alert('FIR accepted : ' + (data.message || 'Success'));
                 setSelectedFir(null);
-                window.location.reload();
+                loadFIRs();
+
             } catch (err) {
-                console.error('Error during acceptance:', err);
                 alert(err.message);
             }
         }
     };
+
+    const filteredFirs = filterStatus === 'All' ? firs : firs.filter(fir => fir.status === filterStatus);
 
     if (loading) return <p>Loading FIRs...</p>;
     if (error) return <p>Error: {error}</p>;
@@ -102,6 +95,23 @@ export default function FIRTable() {
     return (
         <div className="fir-table-container">
             <h2>FIR Records</h2>
+
+            {/* Filter with updated styling */}
+            <div className="status-filter-container">
+                <label htmlFor="statusFilter">Filter by Status:</label>
+                <select
+                    id="statusFilter"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="status-filter-select"
+                >
+                    <option value="All">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+
             <table>
                 <thead>
                     <tr>
@@ -114,7 +124,7 @@ export default function FIRTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    {firs.map((fir, idx) => (
+                    {filteredFirs.map((fir, idx) => (
                         <tr
                             key={fir._id}
                             onClick={() => fetchFirDetail(fir._id)}

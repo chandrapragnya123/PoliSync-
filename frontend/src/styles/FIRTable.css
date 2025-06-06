@@ -63,3 +63,86 @@ h2 {
     margin-top: 30px;
     text-align: center;
 }
+
+button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: #FFFDF2;
+    /* light text */
+}
+
+button.accept {
+    background-color: #415A77;
+    /* cool blue */
+}
+
+button.accept:hover {
+    background-color: #778DA9;
+    /* lighter blue */
+}
+
+button.reject {
+    background-color: #EB5E28;
+    /* your hover orange */
+}
+
+button.reject:hover {
+    background-color: #FF7F50;
+    /* lighter orange */
+}
+
+button.close {
+    background-color: #CCC5B9;
+    /* header bg */
+    color: #252422;
+    /* dark text */
+}
+
+button.close:hover {
+    background-color: #A89F91;
+    /* darker shade */
+}
+
+/* Existing table styles (your styles) */
+/* ... keep your existing FIRTable.css code ... */
+
+/* New styles for status filter */
+
+.status-filter-container {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1B263B;
+    /* Dark blue */
+}
+
+.status-filter-select {
+    padding: 8px 12px;
+    border: 2px solid #415A77;
+    /* Medium blue border */
+    border-radius: 6px;
+    background-color: #E0E1DD;
+    /* Light background */
+    font-size: 1rem;
+    font-weight: 500;
+    color: #0D1B2A;
+    /* Darker text */
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    min-width: 150px;
+}
+
+.status-filter-select:hover,
+.status-filter-select:focus {
+    border-color: #778DA9;
+    /* Lighter blue on hover/focus */
+    outline: none;
+}

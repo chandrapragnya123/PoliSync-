@@ -24,7 +24,4 @@ UserSchema.pre('save', async function (next) {
 });
 
 // ✅ Register with mongoose (global) so .populate('User') works
-const UserModel = mongoose.connection.useDb('polisync').model('User', UserSchema);
-mongoose.model('User', UserModel.schema); // 🔥 register globally for populate
-
-module.exports = UserModel;
+module.exports = mongoose.model('User', UserSchema);

@@ -38,7 +38,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI, {
-   dbName: 'polisynccluster',
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
