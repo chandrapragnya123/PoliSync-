@@ -1,4 +1,3 @@
-// Updated Chatbot.jsx without firNumber references
 import { useState, useEffect } from 'react';
 import '../styles/chatbot.css';
 
@@ -7,8 +6,15 @@ const initialFirData = {
   email: '',
   phone: '',
   address: '',
+  city: '',
+  state: '',
+  postalCode: '',
+  country: 'India',
   incidentDate: '',
   incidentLocation: '',
+  landmark: '',
+  gpsLat: '',
+  gpsLng: '',
   description: '',
   crimeType: '',
 };
@@ -17,9 +23,16 @@ const questions = [
   { key: 'name', prompt: "What's your full name?" },
   { key: 'email', prompt: "What's your email address?" },
   { key: 'phone', prompt: "What's your phone number?" },
-  { key: 'address', prompt: "What's your address?" },
+  { key: 'address', prompt: "What's your street address?" },
+  { key: 'city', prompt: "Which city do you live in?" },
+  { key: 'state', prompt: "Which state do you live in?" },
+  { key: 'postalCode', prompt: "What's your postal code?" },
+  { key: 'country', prompt: "Which country? (default is India)" },
   { key: 'incidentDate', prompt: "When did the incident occur? (YYYY-MM-DD)" },
   { key: 'incidentLocation', prompt: "Where did the incident happen?" },
+  { key: 'landmark', prompt: "Nearby landmark? (type 'skip' to leave blank)" },
+  { key: 'gpsLat', prompt: "GPS Latitude? (type 'skip' to leave blank)" },
+  { key: 'gpsLng', prompt: "GPS Longitude? (type 'skip' to leave blank)" },
   { key: 'description', prompt: "Please describe the incident in detail." },
 ];
 
@@ -36,12 +49,11 @@ const Chatbot = ({ onClose }) => {
   const [mediaFile, setMediaFile] = useState(null);
 
   useEffect(() => {
-    if (messages.length === 1) {
-      setTimeout(() => {
-        setMessages(prev => [...prev, { text: questions[0].prompt, sender: 'bot' }]);
-      }, 600);
-    }
-  }, [messages.length]);
+    const timer = setTimeout(() => {
+      askNext(0); // Start the first question
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const askNext = (nextStep, newFirData) => {
     if (nextStep < questions.length) {
@@ -72,7 +84,10 @@ const Chatbot = ({ onClose }) => {
       setFirData(fir => ({ ...fir, crimeType }));
       setMessages(prev => [
         ...prev,
-        { text: `The AI classified this as \"${crimeType}\". Type 'yes' to confirm or enter the correct crime type.`, sender: 'bot' }
+        {
+          text: `The AI classified this as "${crimeType}". Type 'yes' to confirm or enter the correct crime type.`,
+          sender: 'bot'
+        }
       ]);
       setAwaitingCrimeConfirmation(true);
     } catch (err) {
@@ -111,14 +126,17 @@ const Chatbot = ({ onClose }) => {
     try {
       const formData = new FormData();
 
-      // Construct the complaint JSON payload
       const complaintPayload = {
         complainant: {
           fullName: complaint.name,
           email: complaint.email,
           phoneNumber: complaint.phone,
           address: {
-            street: complaint.address
+            street: complaint.address,
+            city: complaint.city,
+            state: complaint.state,
+            postalCode: complaint.postalCode,
+            country: complaint.country || 'India'
           }
         },
         crimeType: {
@@ -127,23 +145,25 @@ const Chatbot = ({ onClose }) => {
         incidentDetails: {
           date: complaint.incidentDate,
           location: {
-            address: complaint.incidentLocation
+            address: complaint.incidentLocation,
+            landmark: complaint.landmark || '',
+            gpsCoordinates: {
+              lat: complaint.gpsLat || '',
+              lng: complaint.gpsLng || ''
+            }
           },
           description: complaint.description
         }
       };
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
+
       formData.append('complaintData', JSON.stringify(complaintPayload));
-      if (file) formData.append('evidence', file); // optional
+      if (file) formData.append('evidenceFiles', file);
 
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/complaints', {
+      const res = await fetch('http://localhost:5000/api/firs', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          // Note: Don't set Content-Type header when sending FormData; browser sets it automatically
+          Authorization: `Bearer ${token}`,
         },
         body: formData
       });
@@ -153,7 +173,7 @@ const Chatbot = ({ onClose }) => {
       if (res.ok) {
         setMessages(prev => [
           ...prev,
-          { text: `Complaint submitted successfully! Please check your email for updates.`, sender: 'bot' }
+          { text: "Complaint submitted successfully! Please check the status in My Complaints section", sender: 'bot' }
         ]);
       } else {
         setMessages(prev => [
@@ -189,7 +209,14 @@ const Chatbot = ({ onClose }) => {
     }
 
     const currentKey = questions[step]?.key;
-    const newFirData = { ...firData, [currentKey]: input };
+    const newFirData = { ...firData };
+
+    if (['landmark', 'gpsLat', 'gpsLng'].includes(currentKey) && input.trim().toLowerCase() === 'skip') {
+      newFirData[currentKey] = '';
+    } else {
+      newFirData[currentKey] = input;
+    }
+
     setFirData(newFirData);
     setInput('');
     askNext(step + 1, newFirData);
@@ -198,7 +225,7 @@ const Chatbot = ({ onClose }) => {
   return (
     <div className="chatbot-popup">
       <div style={{ textAlign: 'right', padding: '8px' }}>
-        <button onClick={onClose} style={{
+        <button className="close-btn"onClick={onClose} style={{
           background: 'transparent',
           border: 'none',
           cursor: 'pointer',
@@ -221,11 +248,16 @@ const Chatbot = ({ onClose }) => {
           disabled={isSubmitting}
           onKeyDown={e => e.key === 'Enter' && sendMessage()}
         />
+        <label htmlFor="file-upload" className="custom-file-upload">
+          📎 Upload
+        </label>
         <input
+          id="file-upload"
           type="file"
           accept="image/*,video/*"
           onChange={e => setMediaFile(e.target.files[0])}
           disabled={isSubmitting}
+          style={{ display: 'none' }}
         />
         <button onClick={sendMessage} disabled={isSubmitting}>Send</button>
       </div>
