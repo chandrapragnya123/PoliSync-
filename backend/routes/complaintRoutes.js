@@ -1,21 +1,29 @@
-// backend/routes/complaintRoutes.js
+// backend/routes/firRoutes.js
 
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const Complaint = require('../models/Complaint'); // Adjust path if needed
+const FIR = require('../models/FIR'); // ✅ Use FIR model directly
+const { auth, USER_ROLES } = require('../middleware/auth');
 
-// Configure multer for memory storage (evidence will be in req.file.buffer)
 const upload = multer({ storage: multer.memoryStorage() });
 
-// POST /api/complaint
-router.post('/', upload.fields([
+// ---------------------------
+// ✅ POST /api/firs - Submit FIR
+// ---------------------------
+router.post(
+  '/',
+  auth([USER_ROLES.CITIZEN]),
+  upload.fields([
     { name: 'complaintData', maxCount: 1 },
     { name: 'evidence', maxCount: 1 }
-  ]), async (req, res) => {
+  ]),
+  async (req, res) => {
     try {
-      const rawData = req.body.complaintData;
+      console.log('▶️ Incoming request body:', req.body);
+      console.log('▶️ Incoming files:', req.files);
 
+      const rawData = req.body.complaintData;
       if (!rawData) {
         return res.status(400).json({ message: 'Missing complaintData field in request' });
       }
@@ -37,18 +45,33 @@ router.post('/', upload.fields([
         buffer: evidenceFile.buffer
       } : null;
 
-      const complaint = new Complaint({
+      const fir = new FIR({
         ...complaintData,
-        evidence
+        evidence,
+        createdBy: req.user._id
       });
 
-      await complaint.save();
-      res.status(200).json({ message: 'Complaint submitted successfully' });
-    } catch (err) {
-      console.error('Complaint save error:', err);
-      res.status(500).json({ message: 'Failed to save complaint', error: err.message });
-    }
-});
+      await fir.save();
+      res.status(200).json({ message: 'FIR submitted successfully' });
 
+    } catch (err) {
+      console.error('❌ FIR save error:', err);
+      res.status(500).json({ message: 'Failed to save FIR', error: err.message });
+    }
+  }
+);
+
+// ---------------------------
+// ✅ GET /api/firs/my - Get FIRs for logged-in citizen
+// ---------------------------
+router.get('/my', auth([USER_ROLES.CITIZEN]), async (req, res) => {
+  try {
+    const firs = await FIR.find({ createdBy: req.user._id }).sort({ createdAt: -1 });
+    res.json(firs);
+  } catch (err) {
+    console.error('Failed to fetch FIRs:', err);
+    res.status(500).json({ message: 'Failed to fetch FIRs', error: err.message });
+  }
+});
 
 module.exports = router;

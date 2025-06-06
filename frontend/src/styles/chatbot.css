@@ -37,7 +37,7 @@
 }
 
 .message.user {
-  background: #0084ff;
+  background: #d24f01; /* Orange color */
   color: white;
   align-self: flex-end;
 }
@@ -61,7 +61,7 @@
 .input-box button {
   margin-left: 8px;
   padding: 8px 12px;
-  background: #007bff;
+  background: #d24f01;
   color: white;
   border: none;
   border-radius: 8px;
@@ -73,7 +73,7 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #007bff;
+  background-color: #d24f01;
   color: white;
   border-radius: 50%;
   width: 56px;

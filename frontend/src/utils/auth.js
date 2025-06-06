@@ -2,7 +2,7 @@
 export const ROLES = {
     NONE: 'none',
     CITIZEN: 'citizen',
-    POLICE: 'police',
+    OFFICER: 'officer',
   };
   
 export async function registerUser(name, email, password) {

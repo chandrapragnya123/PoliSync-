@@ -11,7 +11,7 @@ const HomeOfficer = () => {
   const [user, setUser] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => setUser(localStorage.getItem('loggedInUser') || 'Police'), []);
+  useEffect(() => setUser(localStorage.getItem('loggedInUser') || 'Officer'), []);
 
   const handleLogout = () => {
     clearRole();

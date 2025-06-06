@@ -114,6 +114,7 @@ const FileFIR = () => {
       const response = await fetch('http://localhost:5000/api/firs', {
         method: 'POST',
         body: data,
+        credentials: 'include'
       });
 
       const result = await response.json();

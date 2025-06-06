@@ -45,7 +45,7 @@ const HomeCitizen = () => {
           position: 'fixed',
           bottom: '20px',
           right: '20px',
-          backgroundColor: '#007bff',
+          backgroundColor: '#d24f01',
           color: 'white',
           borderRadius: '50%',
           padding: '15px',

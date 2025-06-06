@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const FIR = require('../models/FIR');
-const Complaint = require('../models/Complaint');
 const Officer = require('../models/User'); // Assuming Officer is also in User model
 const { auth, USER_ROLES } = require('../middleware/auth');
 
@@ -14,15 +13,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // ------------------ SUBMIT FIR (CITIZEN) ------------------
-router.post('/', upload.array('evidenceFiles'), async (req, res) => {
+router.post('/', auth([USER_ROLES.CITIZEN]), upload.array('evidenceFiles'), async (req, res) => {
   try {
     const complaintData = typeof req.body.complaintData === 'string'
-  ? JSON.parse(req.body.complaintData)
-  : req.body.complaintData;
+      ? JSON.parse(req.body.complaintData)
+      : req.body.complaintData;
 
-const complainant = complaintData.complainant;
-const incidentDetails = complaintData.incidentDetails;
-const crimeType = complaintData.crimeType;
+    const complainant = complaintData.complainant;
+    const incidentDetails = complaintData.incidentDetails;
+    const crimeType = complaintData.crimeType;
 
     if (!complainant?.fullName || !complainant?.email || !complainant?.phoneNumber)
       return res.status(400).json({ error: 'Complainant details are incomplete' });
@@ -40,7 +39,7 @@ const crimeType = complaintData.crimeType;
         evidence: [],
       },
       crimeType,
-      createdBy: req.user?._id || null,
+      createdBy: req.user._id, // ✅ Attach logged-in user's ID
       status: 'Pending',
     };
 
@@ -70,7 +69,19 @@ const crimeType = complaintData.crimeType;
   }
 });
 
-// ------------------ GET ALL FIRs ------------------
+// ------------------ GET FIRs of logged-in citizen ------------------
+router.get('/my', auth([USER_ROLES.CITIZEN]), async (req, res) => {
+  console.log("▶️ Logged-in user:", req.user);
+  try {
+    const firs = await FIR.find({ createdBy: req.user._id }).sort({ createdAt: -1 });
+    res.json(firs);
+  } catch (err) {
+    console.error('Failed to fetch FIRs:', err);
+    res.status(500).json({ message: 'Failed to fetch FIRs', error: err.message });
+  }
+});
+
+// ------------------ GET ALL FIRs (ADMIN/OFFICER) ------------------
 router.get('/', async (req, res) => {
   try {
     const firs = await FIR.find().sort({ createdAt: -1 });
@@ -93,9 +104,8 @@ router.get('/:id', async (req, res) => {
 });
 
 // ------------------ OFFICER ACTION: ACCEPT/REJECT ------------------
-router.patch('/:id/status', async (req, res) => {
+router.patch('/:id/status', auth([USER_ROLES.OFFICER]), async (req, res) => {
   try {
-    // Helper function to normalize the status value
     const normalizeStatus = (status) => {
       if (!status) return null;
       const s = status.toLowerCase();
@@ -122,26 +132,11 @@ router.patch('/:id/status', async (req, res) => {
 
     await fir.save();
 
-    if (cleanStatus === 'Accepted') {
-      const complaint = new Complaint({
-        firId: fir._id,
-        complainant: fir.complainant,
-        incidentDetails: fir.incidentDetails,
-        crimeType: fir.crimeType,
-        officer: officerId,
-        status: 'Open',
-        createdAt: new Date(),
-      });
-      await complaint.save();
-    }
-
     res.json({ message: `FIR ${cleanStatus.toLowerCase()} successfully`, fir });
   } catch (err) {
     console.error('Status update error:', err);
     res.status(500).json({ error: 'Action failed' });
   }
 });
-
-
 
 module.exports = router;

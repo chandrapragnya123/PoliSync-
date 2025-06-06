@@ -1,6 +1,7 @@
 // Load environment variables from .env
 require('dotenv').config();
 
+
 // Core modules and libraries
 const express = require('express');
 const mongoose = require('mongoose');
@@ -17,13 +18,12 @@ app.use('/uploads', express.static('uploads'));
 // ------------------------------------
 // ✅ Middleware
 // ------------------------------------
-app.use(cors());
 
-// Handle preflight requests
-app.options('*', cors({
-  origin: 'http://localhost:3000',
-  credentials: true
+app.use(cors({
+  origin: 'http://localhost:3000', // frontend origin
+  credentials: true                // allow cookies to be sent
 }));
+
 
 // Parse JSON and form data
 app.use(express.json());
@@ -46,6 +46,8 @@ mongoose.connect(MONGO_URI, {
   console.error('❌ MongoDB connection failed:', err);
 });
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser()); // ✅ add this before routes
 
 // ------------------------------------
 // ✅ Routes
@@ -61,7 +63,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/firs', firRoutes);
 // app.use('/api/complaint', filedCasesRoute); // Make sure this does not conflict
 app.use('/api/classify-crime', crimeClassifierRoute);
-app.use('/api/complaints', complaintRoutes);
 
 // Test route
 app.get('/api/test', (req, res) => {

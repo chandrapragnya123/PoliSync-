@@ -5,7 +5,7 @@ import { handleError, handleSuccess } from '../utils';
 import logo from '../assets/logo.png';
 import '../styles/Login.css';
 
-const roles = { citizen: 'Citizen', police: 'Police' };
+const roles = { citizen: 'Citizen', officer: 'officer' };
 
 const Login = () => {
   const [role, setRole] = useState('citizen'); // toggle state

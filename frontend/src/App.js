@@ -6,16 +6,17 @@ import HomeOfficer from './pages/HomeOfficer';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import FileFIR from './pages/FileFIR';
+import MyComplaints from './pages/MyComplaints';
 import RequireAuth from './components/RequireAuth';
 import FIRConfirmation from './pages/FIRConfirmationPage';
 
-import Header from './components/Header';
-import Footer from './components/Footer';
 import ViewCrimeDashboard from './pages/ViewCrimeDashboard';
 import ManageComplaints from './pages/ManageComplaints';
 import Signup from './pages/Signup';
 import ViewFIR from './pages/ViewFIR';
 import AboutUs from './pages/about_us';
+import ViewComplaints from './pages/ViewComplaints';
+
 
 const App = () => (
   <AuthProvider> {/* ✅ Wrap your entire app with AuthProvider */}
@@ -28,7 +29,9 @@ const App = () => (
         <Route path="/homeOfficer" element={<HomeOfficer />} />
         <Route path="/file-fir" element={<FileFIR />} />
         <Route path="/view-fir" element={<ViewFIR />} />
+        <Route path="/my-complaints" element={<ViewComplaints />} />
         <Route path="/view-crime-dashboard" element={<ViewCrimeDashboard />} />
+        <Route path="/my-complaints" element={<RequireAuth role="citizen"><MyComplaints /></RequireAuth>} />
         <Route path="/manage-complaints" element={<ManageComplaints />} />
         <Route path="/about" element={<AboutUs />} />
         <Route

@@ -1,0 +1,82 @@
+.container {
+  max-width: 80rem; /* ~1280px */
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center; /* Add this line */
+  color: #222;
+}
+
+.loading,
+.error,
+.noComplaints {
+  text-align: center;
+  margin-top: 2.5rem;
+  font-weight: 600;
+}
+
+.loading,
+.noComplaints {
+  color: #6b7280; /* gray-500 */
+  font-size: 1.125rem; /* 18px */
+}
+
+.error {
+  color: #dc2626; /* red-600 */
+  font-size: 1.125rem;
+}
+
+.grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgb(99 102 241 / 0.4); /* indigo shadow */
+}
+
+.cardTitle {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  color: #3730a3; /* indigo-700 */
+  margin-bottom: 0.5rem;
+}
+
+.info {
+  color: #374151; /* gray-700 */
+  margin-bottom: 0.5rem;
+}
+
+.info strong {
+  font-weight: 700;
+  color: #111827; /* gray-900 */
+}
+
+.status {
+  font-weight: 700;
+}
+
+.status.resolved {
+  color: #16a34a; /* green-600 */
+}
+
+.status.rejected {
+  color: #dc2626; /* red-600 */
+}
+
+.status.pending {
+  color: #ca8a04; /* yellow-600 */
+}

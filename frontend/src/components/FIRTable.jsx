@@ -109,6 +109,9 @@ export default function FIRTable() {
                     <option value="Pending">Pending</option>
                     <option value="Accepted">Accepted</option>
                     <option value="Rejected">Rejected</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
+
                 </select>
             </div>
 

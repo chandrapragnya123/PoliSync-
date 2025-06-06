@@ -2,7 +2,7 @@
 module.exports = {
     USER_ROLES: {
       CITIZEN: 'citizen',
-      POLICE: 'police',
+      OFFICER: 'officer',
       ADMIN: 'admin'
       // Add other roles if needed
     }

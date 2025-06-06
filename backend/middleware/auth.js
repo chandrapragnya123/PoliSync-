@@ -3,19 +3,23 @@ const User = require('../models/User');
 
 const USER_ROLES = {
   CITIZEN: 'citizen',
-  POLICE: 'police',
+  OFFICER: 'officer',
 };
 
 const auth = (allowedRoles = []) => {
   return async (req, res, next) => {
     try {
       const authHeader = req.header('Authorization');
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      let token;
+
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      } else if (req.cookies && req.cookies.token) {
+        token = req.cookies.token; // ✅ read from cookie
+      } else {
         return res.status(401).json({ error: 'Missing or invalid token' });
       }
 
-      // Extract token safely
-      const token = authHeader.split(' ')[1];
 
       // Verify token, throws if invalid/expired
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
