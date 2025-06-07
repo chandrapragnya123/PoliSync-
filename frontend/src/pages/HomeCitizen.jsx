@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { FaRobot } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { clearRole } from '../utils/auth';
 import Chatbot from '../components/Chatbot'; // Make sure this path is correct
+import Footer from '../components/Footer';
+import Header from '../components/Header';
 import '../styles/common.css';
+import { clearRole } from '../utils/auth';
 
 const HomeCitizen = () => {
   const [user, setUser] = useState('');
@@ -32,9 +32,7 @@ const HomeCitizen = () => {
         <h1>Report, Track, Stay Safe – For a Safer Tomorrow</h1>
         <p>Safeguarding Together: Your Bridge to a Secure Environment</p>
 
-        <div className="features">
-          <Link to="/file-fir"><button>Request to File FIR</button></Link>
-        </div>
+      
       </section>
 
       {/* Chatbot FAB */}

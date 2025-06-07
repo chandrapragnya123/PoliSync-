@@ -5,15 +5,13 @@
   padding: 0;
 }
 
-body,
-html {
-  font-family: 'Segoe UI', sans-serif;
-  color: #252422;
-}
-
-html,
-body {
+html, body {
   height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: 'Segoe UI', sans-serif;
+  color: #d24f01;
+  line-height: 1; /* helps avoid vertical spacing quirks */
 }
 
 /* ===== Navbar / Header ===== */
@@ -22,10 +20,13 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 2rem;
-  background-color: #403D39; /* From your palette */
-  color: #FFFCF2; /* Light cream text for contrast */
+  background-color: #403D39;
+  color: #FFFCF2;
+  margin: 0;
+  border: none;
 }
 
+/* ===== Logo Section ===== */
 .logo-section {
   display: flex;
   align-items: center;
@@ -33,17 +34,11 @@ body {
   height: 100%;
 }
 
-nav a:hover {
-  color: #EB5E28; /* Accent orange for interactivity */
-}
-
 .logo-icon {
   width: 50px;
   height: 50px;
   object-fit: contain;
   display: block;
-  
-
 }
 
 .logo-text {
@@ -53,9 +48,10 @@ nav a:hover {
   display: flex;
   align-items: center;
   line-height: 1;
-  padding-bottom: 18px; /* ✅ optional tiny nudge to match all heights in header*/
+  padding-bottom: 18px;
 }
 
+/* ===== Navigation Links ===== */
 .nav-links {
   list-style: none;
   display: flex;
@@ -66,9 +62,14 @@ nav a:hover {
   color: #FFFCF2;
   text-decoration: none;
   font-weight: 500;
-  margin: 0 1.5rem; /* Increase space between links */
+  margin: 0 1.5rem;
 }
 
+nav a:hover {
+  color: #EB5E28;
+}
+
+/* ===== Auth Buttons ===== */
 .auth-buttons button {
   margin-left: 1rem;
   padding: .5rem 1rem;
@@ -89,35 +90,37 @@ nav a:hover {
   color: #FFFCF2;
 }
 
-/* ===== Hero (shared) ===== */
+/* ===== Hero Section ===== */
 .hero {
   text-align: center;
-  padding: 3rem 2rem;
-  background: url('../assets/bg.png') no-repeat center/cover;
+  padding: 0 2rem;
+  margin: 0;
   position: relative;
-  min-height: 100vh;
-  /* keeps the larger image you asked for */
+  min-height: 120vh;
   display: flex;
-  /* enables centering */
   flex-direction: column;
-  /* stack h1, p, .features */
   justify-content: center;
-  /* vertical centering */
   align-items: center;
+  overflow: hidden;
+  z-index: 0;
+  font-size: 0; /* removes inline spacing bug */
 }
 
 .hero::before {
   content: "";
-  inset: 0;
   position: absolute;
-  background: rgba(58, 58, 58, .7);
-  z-index: 1;
+  top: 0; bottom: 0; left: 0; right: 0;
+  background: 
+    linear-gradient(rgba(58, 58, 58, 0.7), rgba(58, 58, 58, 0.7)),
+    url('../assets/bg.png') no-repeat center/cover;
+  z-index: 0;
 }
 
-.hero>* {
+.hero > * {
   position: relative;
   z-index: 1;
   align-items: center;
+  font-size: revert; /* bring back readable text size */
 }
 
 .hero h1 {
@@ -133,7 +136,7 @@ nav a:hover {
   margin-bottom: 2rem;
 }
 
-/* ===== Feature buttons ===== */
+/* ===== Feature Buttons ===== */
 .features {
   display: flex;
   flex-wrap: wrap;
@@ -154,15 +157,14 @@ nav a:hover {
   gap: 0.5rem;
   cursor: pointer;
   font-weight: bold;
-  text-decoration: none; /* removes the underline */
+  text-decoration: none;
 }
 
 .feature-button:hover {
   background: #d24f01;
 }
 
-
-/* ===== Chatbot fab ===== */
+/* ===== Chatbot Fab ===== */
 .chatbot-fab {
   position: fixed;
   bottom: 2rem;
@@ -277,14 +279,4 @@ nav a:hover {
   line-height: 1.5;
   font-size: .9rem;
   color: #ccc;
-}
-
-
-/* to render bg full view and display footer after scrolling */
-.page-bg-wrapper {
-  min-height: 100vh;
-  background: url('../assets/bg.png') no-repeat center center / cover;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
 }
