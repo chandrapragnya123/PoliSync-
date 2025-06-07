@@ -31,28 +31,38 @@ const Header = () => {
   };
 
   const commonLinks = (
+  <>
+    <li><Link to="/" style={navButtonStyle}>Home</Link></li>
+    <li><Link to="/about" style={navButtonStyle}>About Us</Link></li>
+  </>
+);
+
+  let extraLinks = (
+  <>
+    <li>
+      <Link to="/Dashboard" style={navButtonStyle}>Crime Dashboard</Link>
+    </li>
+  </>
+);
+
+if (role === ROLES.CITIZEN) {
+  extraLinks = (
     <>
-      <li><button onClick={() => navigate('/')} style={navButtonStyle}>Home</button></li>
-      <li><button onClick={() => navigate('/about')} style={navButtonStyle}>About Us</button></li>
+      {extraLinks}
+      <li><Link to="/my-complaints" style={navButtonStyle}>My Complaints</Link></li>
+      <li><Link to="/file-fir" style={navButtonStyle}>Request FIR</Link></li>
     </>
   );
+} else if (role === ROLES.OFFICER) {
+  extraLinks = (
+    <>
+      {extraLinks}
+      <li><Link to="/view-fir" style={navButtonStyle}>FIR's</Link></li>
+      <li><Link to="/manage-complaints" style={navButtonStyle}>Complaints</Link></li>
+    </>
+  );
+}
 
-  let extraLinks;
-  if (role === ROLES.CITIZEN)
-    extraLinks = (
-      <>
-        <li><Link to="/my-complaints" style={navButtonStyle}>My Complaints</Link></li>
-        <li><Link to="/file-fir" style={navButtonStyle}>Request FIR</Link></li>
-      </>
-    );
-  else if (role === ROLES.OFFICER)
-    extraLinks = (
-      <>
-        <li><Link to="/view-crime-dashboard" style={navButtonStyle}>Dashboard</Link></li>
-        <li><Link to="/view-fir" style={navButtonStyle}>FIR's</Link></li>
-        <li><Link to="/manage-complaints" style={navButtonStyle}>Complaints</Link></li>
-      </>
-    );
 
   const authArea =
     role === ROLES.NONE ? (
