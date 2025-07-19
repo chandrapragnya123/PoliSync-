@@ -18,7 +18,7 @@ app.use('/uploads', express.static('uploads'));
 // ------------------------------------
 
 app.use(cors({
-  origin: '*',
+  origin: 'https://polisyncwebsite2.netlify.app',
   credentials: true
 }));
 
