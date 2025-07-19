@@ -18,8 +18,8 @@ app.use('/uploads', express.static('uploads'));
 // ------------------------------------
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://your-frontend-name.netlify.app'], // frontend origin
-  credentials: true                // allow cookies to be sent
+  origin: '*',
+  credentials: true
 }));
 
 
