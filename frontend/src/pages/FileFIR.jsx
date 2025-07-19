@@ -111,7 +111,7 @@ const FileFIR = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/fir`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/firs`, {
         method: 'POST',
         body: data,
         credentials: 'include'

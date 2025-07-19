@@ -1,7 +1,5 @@
 // Load environment variables from .env
 require('dotenv').config();
-
-
 // Core modules and libraries
 const express = require('express');
 const mongoose = require('mongoose');
@@ -20,7 +18,7 @@ app.use('/uploads', express.static('uploads'));
 // ------------------------------------
 
 app.use(cors({
-  origin: 'http://localhost:3000', // frontend origin
+  origin: ['http://localhost:3000', 'https://your-frontend-name.netlify.app'], // frontend origin
   credentials: true                // allow cookies to be sent
 }));
 
