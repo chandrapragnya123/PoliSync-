@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles/chatbot.css';
 
 const initialFirData = {
@@ -47,15 +47,7 @@ const Chatbot = ({ onClose }) => {
   const [awaitingCrimeConfirmation, setAwaitingCrimeConfirmation] = useState(false);
   const [isAwaitingSubmissionConfirmation, setIsAwaitingSubmissionConfirmation] = useState(false);
   const [mediaFile, setMediaFile] = useState(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      askNext(0); // Start the first question
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const askNext = (nextStep, newFirData) => {
+const askNext = (nextStep, newFirData) => {
     if (nextStep < questions.length) {
       setMessages(prev => [
         ...prev,
@@ -67,6 +59,14 @@ const Chatbot = ({ onClose }) => {
     }
   };
 
+ useEffect(() => {
+    const timer = setTimeout(() => {
+      askNext(0); // Start the first question
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [askNext]);
+
+  
   const classifyCrime = async (description, newFirData) => {
     setMessages(prev => [
       ...prev,

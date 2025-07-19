@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FileText, Send } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/FileFIR.css';
 
 const FileFIR = () => {
@@ -111,7 +111,7 @@ const FileFIR = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/firs', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/firs`, {
         method: 'POST',
         body: data,
         credentials: 'include'
