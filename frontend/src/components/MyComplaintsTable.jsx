@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles/FIRTable.css'; // Reuses FIRTable styles
 
 export default function MyComplaintsTable() {
@@ -14,7 +14,7 @@ export default function MyComplaintsTable() {
 
     const loadComplaints = () => {
         setLoading(true);
-        fetch('/api/firs/my')
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/firs/my`)
             .then((res) => {
                 if (!res.ok) throw new Error('Failed to fetch complaints');
                 return res.json();

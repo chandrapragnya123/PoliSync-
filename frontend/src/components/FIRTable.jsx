@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles/FIRTable.css';
 
 export default function FIRTable() {
@@ -14,7 +14,7 @@ export default function FIRTable() {
 
     const loadFIRs = () => {
         setLoading(true);
-        fetch('/api/firs')
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/firs`)
             .then((res) => {
                 if (!res.ok) throw new Error('Failed to fetch');
                 return res.json();
@@ -32,11 +32,12 @@ export default function FIRTable() {
 
     const fetchFirDetail = async (firId) => {
         try {
-            const res = await fetch(`/api/firs/${firId}`);
+            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/firs/${firId}`);
             if (!res.ok) throw new Error('Failed to fetch FIR detail');
             const data = await res.json();
             setSelectedFir(data);
         } catch (err) {
+
             alert('Error loading FIR detail: ' + err.message);
         }
     };
@@ -48,7 +49,8 @@ export default function FIRTable() {
             const reason = prompt('Enter reason for rejection:');
             if (!reason) return;
             try {
-                const res = await fetch(`/api/firs/${selectedFir._id}/status`, {
+                const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/firs/${selectedFir._id}/status`, {
+
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: 'Rejected', rejectionReason: reason }),
@@ -67,7 +69,7 @@ export default function FIRTable() {
             }
         } else if (action === 'Accepted') {
             try {
-                const res = await fetch(`/api/firs/${selectedFir._id}/status`, {
+                const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/firs/${selectedFir._id}/status`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: 'Accepted' }),

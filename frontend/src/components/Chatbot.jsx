@@ -73,7 +73,7 @@ const askNext = (nextStep, newFirData) => {
       { text: "Analyzing the crime type...", sender: 'bot' }
     ]);
     try {
-      const res = await fetch('http://localhost:5000/api/classify-crime', {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/classify-crime`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: description }),
@@ -160,7 +160,8 @@ const askNext = (nextStep, newFirData) => {
       if (file) formData.append('evidenceFiles', file);
 
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/firs', {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/firs`, {
+
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

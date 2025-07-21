@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 import '../styles/MyComplaints.css'; // Ensure you have a CSS file for styling
 const MyComplaints = () => {
   const [complaints, setComplaints] = useState([]);
@@ -8,7 +8,10 @@ const MyComplaints = () => {
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const response = await axios.get('/api/firs/my', { withCredentials: true });
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/firs/my`, {
+  withCredentials: true
+});
+
         setComplaints(response.data);
       } catch (err) {
         console.error('Error fetching complaints:', err);
