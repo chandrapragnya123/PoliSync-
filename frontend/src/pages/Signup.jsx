@@ -2,9 +2,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { handleError, handleSuccess } from '../utils';
 import logo from '../assets/logo.png';
 import '../styles/Login.css';
+import { handleError, handleSuccess } from '../utils';
 
 const roles = { citizen: 'Citizen', officer: 'Officer' };
 
@@ -23,7 +23,7 @@ const Signup = () => {
       return handleError('All fields are required');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/register', {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role }),
